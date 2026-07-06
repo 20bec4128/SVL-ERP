@@ -22,6 +22,8 @@ import CustomerLayout from "./layouts/CustomerLayout";
 import CustomerInvoicePage from "./pages/customer/CustomerInvoicePage";
 import CustomerPaymentPage from "./pages/customer/CustomerPaymentPage";
 import CustomerPaymentHistoryPage from "./pages/customer/CustomerPaymentHistoryPage";
+import CustomerChatPage from "./pages/customer/CustomerChatPage";
+import CustomerStatusPage from "./pages/customer/CustomerStatusPage";
 
 const adminPageModules = import.meta.glob("./pages/admin/*Page.jsx");
 
@@ -234,6 +236,8 @@ export default function App() {
           <Route path="invoice" element={<CustomerInvoicePage />} />
           <Route path="payment" element={<CustomerPaymentPage />} />
           <Route path="payment-history" element={<CustomerPaymentHistoryPage />} />
+          <Route path="chat" element={<CustomerChatPage />} />
+          <Route path="status" element={<CustomerStatusPage />} />
         </Route>
         <Route path="/" element={<AdminLayout />}>
           <Route index element={<RoleRedirect />} />

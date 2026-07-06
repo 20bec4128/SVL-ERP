@@ -61,7 +61,7 @@ export default function LeadListView({
     (isVis("source") ? 1 : 0) +
     (isVis("status") ? 1 : 0) +
     (isVis("owner") ? 1 : 0) +
-    (isVis("assignedBy") && (role === "ADMIN" || role === "SUPER_ADMIN") ? 1 : 0) +
+    (isVis("assignedBy") && (role === "ADMIN" || role === "SUPER_ADMIN" || role === "MANAGER") ? 1 : 0) +
     (isVis("createdOn") ? 1 : 0) +
     1; // actions always shown
 
@@ -112,7 +112,7 @@ export default function LeadListView({
                 {ownerColumnLabel}
               </th>
             )}
-            {isVis("assignedBy") && (role === "ADMIN" || role === "SUPER_ADMIN") && (
+            {isVis("assignedBy") && (role === "ADMIN" || role === "SUPER_ADMIN" || role === "MANAGER") && (
               <th className="col-assigned-by text-muted" style={{ fontWeight: "600", fontSize: "0.85rem" }}>
                 Assigned By
               </th>
@@ -207,7 +207,7 @@ export default function LeadListView({
                       {isEmployee ? row.allocator || "-" : row.owner || "-"}
                     </td>
                   )}
-                  {isVis("assignedBy") && (role === "ADMIN" || role === "SUPER_ADMIN") && (
+                  {isVis("assignedBy") && (role === "ADMIN" || role === "SUPER_ADMIN" || role === "MANAGER") && (
                     <td className="col-assigned-by" style={{ fontSize: "0.9rem", color: "#475569" }}>
                       {row.allocator || "-"}
                     </td>

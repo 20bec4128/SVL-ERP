@@ -56,6 +56,7 @@ import LeadListView from "../../components/admin/LeadListView";
 import LeadGridView from "../../components/admin/LeadGridView";
 import PageSizeSelector from "../../components/admin/PageSizeSelector";
 import ColumnVisibilityDropdown from "../../components/admin/ColumnVisibilityDropdown";
+import LeadDetailsModal from "../../components/admin/LeadDetailsModal";
 
 const EMPTY_CREATE_FORM = {
   createBranchId: "",
@@ -335,6 +336,20 @@ export default function LeadsPage() {
   const navigate = useNavigate();
   const { user } = useAuth();
   const role = String(user?.role || "").toUpperCase();
+  const leadColumns = useMemo(() => {
+    const cols = [
+      { key: "name", label: "Name" },
+      { key: "mobile", label: "Mobile" },
+      { key: "source", label: "Source" },
+      { key: "status", label: "Status" },
+      { key: "owner", label: "Owner" },
+    ];
+    if (role === "ADMIN" || role === "SUPER_ADMIN" || role === "MANAGER") {
+      cols.push({ key: "assignedBy", label: "Assigned By" });
+    }
+    cols.push({ key: "createdOn", label: "Created On" });
+    return cols;
+  }, [role]);
   const actorInstitutionName = String(user?.institutionName || user?.institution || "").trim();
   const { showSuccess, showError } = useToast();
   const { showConfirm, confirmDialog } = useConfirmDialog();
@@ -348,6 +363,7 @@ export default function LeadsPage() {
     quickDate: "",
   });
   const [filterOpen, setFilterOpen] = useState(false);
+  const [selectedLeadForView, setSelectedLeadForView] = useState(null);
 
   const [visibleLeadColumns, setVisibleLeadColumns] = useState(() => {
     try {
@@ -2931,7 +2947,7 @@ ${rowsHtml}
             {/* Actions & Toggles on the Right */}
             <div className="d-flex align-items-center gap-2 flex-wrap">
               <ColumnVisibilityDropdown
-                columns={LEAD_COLUMNS}
+                columns={leadColumns}
                 visible={visibleLeadColumns}
                 onChange={handleLeadColVisChange}
               />
@@ -3020,6 +3036,7 @@ ${rowsHtml}
               onDeleteLead={handleDeleteLead}
               role={role}
               visibleColumns={visibleLeadColumns}
+              onRowClick={(row) => setSelectedLeadForView(row)}
             />
           ) : (
             <LeadGridView
@@ -5286,6 +5303,14 @@ ${rowsHtml}
           </div>
           <div className="modal-backdrop fade show" style={{ zIndex: 1055 }} />
         </>
+      )}
+
+      {selectedLeadForView && (
+        <LeadDetailsModal
+          lead={selectedLeadForView}
+          onClose={() => setSelectedLeadForView(null)}
+          onEdit={(id) => navigate(`/leads/${id}`)}
+        />
       )}
 
       {confirmDialog}

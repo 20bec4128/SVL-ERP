@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { getSalesOrders, recordPayment } from "../../api/leadsApi";
+import { uploadFileRecord } from "../../api/fileManagerApi";
 import { useToast } from "../../components/system/ToastProvider";
 
 export default function CustomerPaymentPage() {
@@ -8,6 +9,7 @@ export default function CustomerPaymentPage() {
   const [amount, setAmount] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("UPI");
   const [referenceNo, setReferenceNo] = useState("");
+  const [selectedFile, setSelectedFile] = useState(null);
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
@@ -34,16 +36,31 @@ export default function CustomerPaymentPage() {
     }
     setSubmitting(true);
     try {
+      let proofFileName = "";
+      let proofFilePath = "";
+      if (selectedFile) {
+        const uploaded = await uploadFileRecord(selectedFile);
+        if (uploaded) {
+          proofFileName = uploaded.name;
+          proofFilePath = uploaded.path;
+        }
+      }
+
       await recordPayment({
         leadId: salesOrder.leadId,
         salesOrderId: salesOrder.id,
         amount: Number(amount),
         paymentMethod,
         referenceNo,
+        proofFileName,
+        proofFilePath,
         status: "PENDING"
       });
       showSuccess("Payment submission recorded! Status: PENDING Verification");
       setReferenceNo("");
+      setSelectedFile(null);
+      const fileInput = document.getElementById("paymentProofFile");
+      if (fileInput) fileInput.value = "";
     } catch (err) {
       showError("Failed to record payment.");
     } finally {
@@ -90,6 +107,17 @@ export default function CustomerPaymentPage() {
               onChange={(e) => setReferenceNo(e.target.value)}
               placeholder="Enter reference or UPI UTR number"
               required
+            />
+          </div>
+
+          <div className="mb-3">
+            <label className="form-label">Payment Proof (Screenshot / Receipt)</label>
+            <input
+              type="file"
+              id="paymentProofFile"
+              className="form-control"
+              onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+              accept="image/*,application/pdf"
             />
           </div>
 
