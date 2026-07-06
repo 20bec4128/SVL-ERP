@@ -4,6 +4,7 @@ import { jsPDF } from "jspdf";
 import autoTable from "jspdf-autotable";
 import { useAuth } from "../../context/AuthContext";
 import { createPortal } from "react-dom";
+import api from "../../utils/api";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import LeadExportDropdown from "../../components/admin/LeadExportDropdown";
 import ColumnVisibilityDropdown from "../../components/admin/ColumnVisibilityDropdown";
@@ -365,6 +366,23 @@ export default function QuotationListPage() {
     });
   };
 
+  const handleConvertToCustomer = async (quotation) => {
+    if (!window.confirm("Are you sure you want to convert this lead to a customer?")) return;
+    try {
+      setLoading(true);
+      await api.post(`/api/v1/customers/convert-lead/${quotation.leadId}`);
+      setSuccessMessage("Lead successfully converted to Customer, first invoice generated, and Portal account created!");
+      const rows = await getQuotations();
+      setQuotations(Array.isArray(rows) ? rows : []);
+    } catch (err) {
+      console.error(err);
+      const errMsg = err?.response?.data || "Failed to convert lead to customer.";
+      setActionError(typeof errMsg === "string" ? errMsg : "Failed to convert lead to customer.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleMarkSent = (quotation) => {
     setMarkSentDialog({
       open: true,
@@ -434,13 +452,37 @@ export default function QuotationListPage() {
     setLogDialog({ open: false, quotation: null });
   };
 
+  const isAdditionalChargeItem = (item) => {
+    if (!item) return false;
+    const specs = (() => {
+      if (item.specs && typeof item.specs === "object") return item.specs;
+      if (!item.specsJson) return {};
+      try { return JSON.parse(item.specsJson); } catch { return {}; }
+    })();
+    const isAddCharge = item.isAdditionalCharge || specs?.isAdditionalCharge || false;
+    const nameLower = (item.productName || "").toLowerCase();
+    const isNameMatch = nameLower.includes("charge") ||
+                        nameLower.includes("fee") ||
+                        nameLower.includes("delivery") ||
+                        nameLower.includes("freight") ||
+                        nameLower.includes("greasing") ||
+                        nameLower.includes("scoring") ||
+                        nameLower.includes("printing") ||
+                        nameLower.includes("cutting") ||
+                        nameLower.includes("packing") ||
+                        nameLower.includes("bundle");
+    return isAddCharge || isNameMatch;
+  };
+
   const openAllocationDialog = (quotation) => {
     const defaultGroup = userGroups[0]?.name || "Production";
     const initialAllocations = {};
     if (quotation?.items) {
-      quotation.items.forEach((item) => {
-        initialAllocations[item.id] = defaultGroup;
-      });
+      quotation.items
+        .filter((item) => !isAdditionalChargeItem(item))
+        .forEach((item) => {
+          initialAllocations[item.id] = defaultGroup;
+        });
     }
     setAllocationDialog({
       open: true,
@@ -469,21 +511,33 @@ export default function QuotationListPage() {
         targetStatus = "Design";
       }
 
+      const { updateLeadRowStatus } = await import("../../api/leadsApi");
+      await updateLeadRowStatus(q.leadId, "deal");
+
       const { getDealByLeadId, updateDealStatus } = await import("../../api/dealsApi");
-      const deal = await getDealByLeadId(q.leadId);
+      let deal = null;
+      for (let i = 0; i < 5; i++) {
+        try {
+          deal = await getDealByLeadId(q.leadId);
+          if (deal) break;
+        } catch (e) {
+          await new Promise((resolve) => setTimeout(resolve, 300));
+        }
+      }
+
       if (deal) {
         await updateDealStatus(deal.id, targetStatus);
         setSuccessMessage(`Successfully allocated items and routed Deal to ${targetStatus}!`);
         // Refresh quotation list to update UI state
         getQuotations().then((rows) => setQuotations(Array.isArray(rows) ? rows : []));
+        setAllocationDialog({ open: false, quotation: null, allocations: {} });
       } else {
-        setActionError("Associated Deal not found for this Lead.");
+        setActionError("Lead successfully converted, but the generated Deal could not be loaded. Please refresh.");
       }
-
-      setAllocationDialog({ open: false, quotation: null, allocations: {} });
     } catch (err) {
       console.error(err);
-      setActionError("Failed to allocate and route quotation items.");
+      const errMsg = err.response?.data?.message || err.response?.data || err.message || "Failed to allocate and route quotation items.";
+      setActionError(typeof errMsg === "string" ? errMsg : JSON.stringify(errMsg));
     }
   };
 
@@ -1112,18 +1166,36 @@ ${rowsHtml}
                                     </button>
                                   </div>
                                 )}
-                                {status === QUOTATION_STATUS_ACCEPTED && ["EMPLOYEE", "TEAM_LEAD", "ADMIN", "SUPER_ADMIN"].includes(userRole) && (
-                                  <div className="mt-2">
-                                    <button
-                                      type="button"
-                                      className="btn btn-primary btn-sm w-100"
-                                      onClick={() => openAllocationDialog(quotation)}
-                                    >
-                                      <i className="ti ti-arrows-split me-1"></i>
-                                      Allocate Items
-                                    </button>
-                                  </div>
-                                )}
+                                {status === QUOTATION_STATUS_ACCEPTED &&
+                                  quotation.leadStatus !== "Converted to Customer" &&
+                                  ["EMPLOYEE", "TEAM_LEAD", "ADMIN", "SUPER_ADMIN"].includes(userRole) && (
+                                    <div className="mt-2">
+                                      <button
+                                        type="button"
+                                        className="btn btn-success btn-sm w-100"
+                                        onClick={() => handleConvertToCustomer(quotation)}
+                                      >
+                                        <i className="ti ti-user-check me-1"></i>
+                                        Convert to Customer
+                                      </button>
+                                    </div>
+                                  )}
+                                 {status === QUOTATION_STATUS_ACCEPTED &&
+                                  quotation.leadStatus === "payment" &&
+                                  quotation.salesOrderStatus &&
+                                  quotation.salesOrderStatus !== "AWAITING_ADVANCE" &&
+                                  ["EMPLOYEE", "TEAM_LEAD", "ADMIN", "SUPER_ADMIN"].includes(userRole) && (
+                                    <div className="mt-2">
+                                      <button
+                                        type="button"
+                                        className="btn btn-primary btn-sm w-100"
+                                        onClick={() => openAllocationDialog(quotation)}
+                                      >
+                                        <i className="ti ti-arrows-split me-1"></i>
+                                        Allocate Items
+                                      </button>
+                                    </div>
+                                  )}
                               </td>
                             )}
                             {isQtVis("total") && (
@@ -1494,7 +1566,9 @@ ${rowsHtml}
                         </tr>
                       </thead>
                       <tbody>
-                        {allocationDialog.quotation?.items?.map((item) => (
+                        {allocationDialog.quotation?.items
+                          ?.filter((item) => !isAdditionalChargeItem(item))
+                          ?.map((item) => (
                           <tr key={item.id}>
                             <td className="fw-semibold" style={{ color: "#0f172a" }}>{item.productName}</td>
                             <td className="small text-muted">{item.specsSummary || "-"}</td>

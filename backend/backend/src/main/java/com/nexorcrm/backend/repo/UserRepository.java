@@ -38,6 +38,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByRole(Role role);
 
+    Optional<User> findByActivationToken(String activationToken);
+
     Page<User> findByRoleInAndIsDeletedFalse(List<Role> roles, Pageable pageable);
 
     Page<User> findByRoleInAndActivationStatusAndIsDeletedFalse(List<Role> roles, ActivationStatus activationStatus, Pageable pageable);

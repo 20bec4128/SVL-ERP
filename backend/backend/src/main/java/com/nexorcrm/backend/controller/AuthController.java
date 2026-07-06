@@ -87,6 +87,15 @@ public class AuthController {
         return ResponseEntity.ok(new ApiMessageResponse(message));
     }
 
+    @PostMapping("/activate")
+    public ResponseEntity<ApiMessageResponse> activate(
+            @RequestParam("token") String token,
+            @RequestBody java.util.Map<String, String> payload) {
+        String password = payload.get("password");
+        String message = authService.activateCustomerAccount(token, password);
+        return ResponseEntity.ok(new ApiMessageResponse(message));
+    }
+
     @PostMapping("/logout")
     public ResponseEntity<ApiMessageResponse> logout(@RequestBody(required = false) TokenRefreshRequest request,
                                                      HttpServletRequest httpRequest,

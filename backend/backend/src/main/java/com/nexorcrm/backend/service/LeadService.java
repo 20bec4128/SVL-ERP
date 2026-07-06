@@ -2429,7 +2429,11 @@ public class LeadService {
         row.setStatus(nextStatus);
 
         if (nextGroupId != null) {
-            row.setAssignedGroupId(nextGroupId);
+            if (userGroupRepository.existsById(nextGroupId)) {
+                row.setAssignedGroupId(nextGroupId);
+            } else {
+                logger.warn("Group ID {} does not exist in user_groups, skipping assignment to prevent foreign key violation", nextGroupId);
+            }
         }
 
         boolean currentOwnerCanStayInTargetGroup = shouldKeepCurrentOwner(row, nextStatus, nextGroupId);

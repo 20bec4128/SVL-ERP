@@ -94,6 +94,9 @@ public class User {
     @Column(name = "password_updated_at")
     private LocalDateTime passwordUpdatedAt;
 
+    @Column(name = "activation_token", length = 255)
+    private String activationToken;
+
     @PrePersist
     void onCreate() {
         if (createdAt == null) {
@@ -302,5 +305,13 @@ public class User {
 
     public void setPasswordUpdatedAt(LocalDateTime passwordUpdatedAt) {
         this.passwordUpdatedAt = passwordUpdatedAt;
+    }
+
+    public String getActivationToken() {
+        return activationToken;
+    }
+
+    public void setActivationToken(String activationToken) {
+        this.activationToken = activationToken;
     }
 }

@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { getSalesOrders, getPaymentsForOrder, verifyPayment, getJobForOrder, getJobTasks, updateJobTaskStatus, assignTaskOperator, submitTaskProof } from "../../api/leadsApi";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import { Link } from "react-router-dom";
+import { useToast } from "../../components/system/ToastProvider";
 
 export default function AdminSalesOrderDashboard() {
+  const { showSuccess, showError } = useToast();
   const [salesOrders, setSalesOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState(null);
@@ -12,9 +14,18 @@ export default function AdminSalesOrderDashboard() {
   const [tasks, setTasks] = useState([]);
   const [activeTab, setActiveTab] = useState("overview"); // overview, payments, workflow
 
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("All");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 8;
+
   useEffect(() => {
     loadSalesOrders();
   }, []);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, statusFilter]);
 
   const loadSalesOrders = async () => {
     setLoading(true);
@@ -63,16 +74,38 @@ export default function AdminSalesOrderDashboard() {
   };
 
   const handleUpdateTaskStatus = async (taskId, status) => {
+    const taskObj = tasks.find(t => t.id === taskId);
+    if (status === 'APPROVED' && taskObj && taskObj.department !== 'DESIGN') {
+      const balance = selectedOrder.totalAmount - selectedOrder.paidAmount;
+      if (balance > 0) {
+        showError(`Cannot approve and complete ${taskObj.department} stage. Outstanding balance of ₹${balance.toLocaleString()} must be cleared first.`);
+        return;
+      }
+    }
     try {
       await updateJobTaskStatus(taskId, status);
+      showSuccess(`Task ${taskObj?.department || ''} status updated successfully.`);
       if (job) {
         const taskList = await getJobTasks(job.id);
         setTasks(taskList);
       }
     } catch (e) {
       console.error(e);
+      showError("Failed to update task status.");
     }
   };
+
+  const filteredOrders = salesOrders.filter((so) => {
+    const matchesSearch = so.soNumber?.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === "All" || so.status === statusFilter;
+    return matchesSearch && matchesStatus;
+  });
+
+  const totalPages = Math.ceil(filteredOrders.length / itemsPerPage) || 1;
+  const paginatedOrders = filteredOrders.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
 
   return (
     <div className="content">
@@ -94,17 +127,45 @@ export default function AdminSalesOrderDashboard() {
         {/* Left Side: Sales Order List */}
         <div className="col-lg-4">
           <div className="card shadow-sm border-0" style={{ borderRadius: 12 }}>
-            <div className="card-header bg-white border-0 py-3">
-              <h5 className="mb-0 fw-semibold">Active Sales Orders</h5>
+            <div className="card-header bg-white border-bottom py-3">
+              <h5 className="mb-2 fw-semibold">Active Sales Orders</h5>
+              <div className="row g-2">
+                <div className="col-7">
+                  <div className="input-group input-group-sm">
+                    <span className="input-group-text bg-light border-0"><i className="ti ti-search text-muted"></i></span>
+                    <input
+                      type="text"
+                      className="form-control bg-light border-0"
+                      placeholder="Search SO..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                    />
+                  </div>
+                </div>
+                <div className="col-5">
+                  <select
+                    className="form-select form-select-sm bg-light border-0 text-muted"
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                  >
+                    <option value="All">All</option>
+                    <option value="PENDING">PENDING</option>
+                    <option value="IN_DESIGN">IN_DESIGN</option>
+                    <option value="IN_PRODUCTION">IN_PRODUCTION</option>
+                    <option value="COMPLETED">COMPLETED</option>
+                    <option value="CANCELLED">CANCELLED</option>
+                  </select>
+                </div>
+              </div>
             </div>
-            <div className="card-body p-0">
+            <div className="card-body p-0" style={{ maxHeight: "480px", overflowY: "auto" }}>
               {loading && salesOrders.length === 0 ? (
                 <div className="p-4 text-center"><LoadingSpinner /></div>
-              ) : salesOrders.length === 0 ? (
-                <div className="p-4 text-center text-muted">No sales orders found. Accept a Quotation to generate.</div>
+              ) : filteredOrders.length === 0 ? (
+                <div className="p-4 text-center text-muted">No sales orders found matching criteria.</div>
               ) : (
                 <div className="list-group list-group-flush">
-                  {salesOrders.map((so) => (
+                  {paginatedOrders.map((so) => (
                     <button
                       key={so.id}
                       onClick={() => selectOrder(so)}
@@ -122,6 +183,25 @@ export default function AdminSalesOrderDashboard() {
                 </div>
               )}
             </div>
+            {totalPages > 1 && (
+              <div className="card-footer bg-white border-top py-2 px-3 d-flex justify-content-between align-items-center">
+                <button
+                  className="btn btn-sm btn-outline-secondary"
+                  disabled={currentPage === 1}
+                  onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                >
+                  Prev
+                </button>
+                <span className="small text-muted">Page {currentPage} of {totalPages}</span>
+                <button
+                  className="btn btn-sm btn-outline-secondary"
+                  disabled={currentPage === totalPages}
+                  onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                >
+                  Next
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
@@ -188,6 +268,7 @@ export default function AdminSalesOrderDashboard() {
                             <th>Amount</th>
                             <th>Reference</th>
                             <th>Status</th>
+                            <th>Proof</th>
                             <th>Action</th>
                           </tr>
                         </thead>
@@ -198,9 +279,23 @@ export default function AdminSalesOrderDashboard() {
                               <td>₹{p.amount}</td>
                               <td>{p.referenceNo || 'N/A'}</td>
                               <td>
-                                <span className={`badge ${p.status === 'VERIFIED' ? 'bg-success' : 'bg-warning'}`}>
+                                <span className={`badge ${p.status === 'VERIFIED' ? 'bg-success' : p.status === 'REJECTED' ? 'bg-danger' : 'bg-warning'}`}>
                                   {p.status}
                                 </span>
+                              </td>
+                              <td>
+                                {p.proofFilePath ? (
+                                  <a
+                                    href={p.proofFilePath}
+                                    target="_blank"
+                                    rel="noreferrer"
+                                    className="btn btn-sm btn-outline-info d-inline-flex align-items-center gap-1"
+                                  >
+                                    <i className="ti ti-eye" /> View Proof
+                                  </a>
+                                ) : (
+                                  <span className="text-muted small">No File</span>
+                                )}
                               </td>
                               <td>
                                 {p.status === 'PENDING' && (

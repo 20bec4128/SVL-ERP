@@ -8,6 +8,7 @@ import { useToast } from "../../components/system/ToastProvider";
 import { extractApiErrorMessage } from "../../utils/errorMessage";
 import PageSizeSelector from "../../components/admin/PageSizeSelector";
 import { validatePhoneNumber } from "../../utils/phoneUtils";
+import api from "../../utils/api";
 
 export default function CustomerPage() {
   const { showSuccess, showError } = useToast();
@@ -36,12 +37,8 @@ export default function CustomerPage() {
   const load = async () => {
     setLoading(true);
     try {
-      // SVL typical users count is moderate, so fetch a larger pool and filter client-side
-      const data = await getUsers(0, 1000);
-      const allUsers = Array.isArray(data.items) ? data.items : [];
-      // Filter for CUSTOMER role
-      const customers = allUsers.filter((u) => String(u.role).toUpperCase() === "CUSTOMER");
-      setRows(customers);
+      const response = await api.get("/api/v1/customers");
+      setRows(Array.isArray(response.data) ? response.data : []);
     } catch (e) {
       showError(extractApiErrorMessage(e, "Failed to load customers"));
       setRows([]);
@@ -68,10 +65,11 @@ export default function CustomerPage() {
     const term = searchText.toLowerCase().trim();
     if (!term) return ordered;
     return ordered.filter((r) => {
-      const name = `${r.firstName || ""} ${r.lastName || ""}`.toLowerCase();
-      const email = String(r.email || "").toLowerCase();
-      const username = String(r.username || "").toLowerCase();
-      return name.includes(term) || email.includes(term) || username.includes(term);
+      const company = String(r.companyName || "").toLowerCase();
+      const contact = String(r.contactPerson || "").toLowerCase();
+      const email = String(r.emailAddress || "").toLowerCase();
+      const custId = String(r.customerId || "").toLowerCase();
+      return company.includes(term) || contact.includes(term) || email.includes(term) || custId.includes(term);
     });
   }, [ordered, searchText]);
 
@@ -182,52 +180,57 @@ export default function CustomerPage() {
             <table className="table table-hover align-middle leads-table mb-0">
               <thead>
                 <tr>
-                  <th className="text-muted" style={{ width: 80, fontWeight: "600", fontSize: "0.85rem" }}>#</th>
-                  <th className="text-muted" style={{ fontWeight: "600", fontSize: "0.85rem" }}>Customer Name</th>
-                  <th className="text-muted" style={{ fontWeight: "600", fontSize: "0.85rem" }}>Email / Username</th>
-                  <th className="text-muted" style={{ fontWeight: "600", fontSize: "0.85rem" }}>Status</th>
-                  <th className="text-muted" style={{ width: 150, fontWeight: "600", fontSize: "0.85rem" }}>Actions</th>
+                  <th className="text-muted" style={{ width: 60, fontWeight: "600", fontSize: "0.85rem" }}>#</th>
+                  <th className="text-muted" style={{ width: 140, fontWeight: "600", fontSize: "0.85rem" }}>Customer ID</th>
+                  <th className="text-muted" style={{ fontWeight: "600", fontSize: "0.85rem" }}>Company / Contact</th>
+                  <th className="text-muted" style={{ fontWeight: "600", fontSize: "0.85rem" }}>Email & Phone</th>
+                  <th className="text-muted" style={{ fontWeight: "600", fontSize: "0.85rem" }}>GST & Type</th>
+                  <th className="text-muted" style={{ fontWeight: "600", fontSize: "0.85rem" }}>Billing Address</th>
+                  <th className="text-muted" style={{ fontWeight: "600", fontSize: "0.85rem" }}>Payment Terms</th>
+                  <th className="text-muted" style={{ width: 120, fontWeight: "600", fontSize: "0.85rem" }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan={5} className="text-center py-4 text-muted">Loading...</td>
+                    <td colSpan={8} className="text-center py-4 text-muted">Loading...</td>
                   </tr>
                 ) : pagedRows.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="text-center py-4 text-muted">No records found</td>
+                    <td colSpan={8} className="text-center py-4 text-muted">No records found</td>
                   </tr>
                 ) : (
                   pagedRows.map((r, i) => (
                     <tr key={r.id}>
                       <td className="fw-semibold" style={{ color: "#1e293b", fontSize: "0.9rem" }}>{(page - 1) * pageSize + i + 1}</td>
+                      <td className="fw-semibold text-primary" style={{ fontSize: "0.9rem" }}>
+                        {r.customerId || "-"}
+                      </td>
                       <td className="fw-semibold" style={{ color: "#0f172a", fontSize: "0.9rem" }}>
-                        {r.firstName || r.lastName ? `${r.firstName || ""} ${r.lastName || ""}` : "-"}
+                        <div>{r.companyName || "-"}</div>
+                        <span className="text-muted small fw-normal">{r.contactPerson || "-"}</span>
                       </td>
                       <td style={{ color: "#475569", fontSize: "0.9rem" }}>
-                        <div>{r.email || "-"}</div>
-                        <div className="text-muted small">{r.username}</div>
+                        <div>{r.emailAddress || "-"}</div>
+                        <div className="text-muted small">{r.mobileNumber || "-"}</div>
                       </td>
-                      <td>
-                        <span className={`badge px-2.5 py-1.5 fs-12 fw-semibold ${r.active ? "bg-success-subtle text-success" : "bg-danger-subtle text-danger"}`} style={{ borderRadius: "6px" }}>
-                          {r.active ? "Active" : "Inactive"}
-                        </span>
+                      <td style={{ color: "#475569", fontSize: "0.85rem" }}>
+                        <div>{r.gstNumber || "-"}</div>
+                        <span className="badge bg-light text-dark border">{r.businessType || "-"}</span>
+                      </td>
+                      <td style={{ color: "#475569", fontSize: "0.85rem", maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                        {r.billingAddress || "-"}
+                      </td>
+                      <td style={{ color: "#475569", fontSize: "0.85rem" }}>
+                        {r.paymentTerms || "-"}
                       </td>
                       <td>
                         <button
-                          className="btn btn-sm btn-outline-primary me-2"
+                          className="btn btn-sm btn-outline-primary"
                           style={{ borderRadius: 8, fontWeight: "600" }}
                           onClick={() => navigate("/quotation", { state: { prefillCustomer: r } })}
                         >
                           Create Quotation
-                        </button>
-                        <button
-                          className="btn btn-sm btn-outline-danger"
-                          style={{ borderRadius: 8, fontWeight: "600" }}
-                          onClick={() => setPendingDelete(r)}
-                        >
-                          Delete
                         </button>
                       </td>
                     </tr>

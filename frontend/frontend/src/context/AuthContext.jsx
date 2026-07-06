@@ -112,7 +112,7 @@ function mergeProfileIntoUser(currentUser, profileData) {
 }
 
 function isPublicUnauthenticatedRoute(pathname) {
-  return String(pathname || "").startsWith("/employee-form/");
+  return String(pathname || "").startsWith("/employee-form/") || String(pathname || "").startsWith("/activate");
 }
 
 export function AuthProvider({ children }) {

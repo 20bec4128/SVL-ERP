@@ -51,6 +51,24 @@ public class JobTask {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @Column(name = "machine_used", length = 100)
+    private String machineUsed;
+
+    @Column(name = "start_time")
+    private LocalDateTime startTime;
+
+    @Column(name = "end_time")
+    private LocalDateTime endTime;
+
+    @Column(name = "material_consumption", length = 500)
+    private String materialConsumption;
+
+    @Column(name = "wastage", length = 200)
+    private String wastage;
+
+    @Column(name = "remarks", columnDefinition = "text")
+    private String remarks;
+
     @PrePersist
     protected void onCreate() {
         this.createdAt = LocalDateTime.now();
@@ -80,4 +98,22 @@ public class JobTask {
     public void setProofFilePath(String proofFilePath) { this.proofFilePath = proofFilePath; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
+
+    public String getMachineUsed() { return machineUsed; }
+    public void setMachineUsed(String machineUsed) { this.machineUsed = machineUsed; }
+
+    public LocalDateTime getStartTime() { return startTime; }
+    public void setStartTime(LocalDateTime startTime) { this.startTime = startTime; }
+
+    public LocalDateTime getEndTime() { return endTime; }
+    public void setEndTime(LocalDateTime endTime) { this.endTime = endTime; }
+
+    public String getMaterialConsumption() { return materialConsumption; }
+    public void setMaterialConsumption(String materialConsumption) { this.materialConsumption = materialConsumption; }
+
+    public String getWastage() { return wastage; }
+    public void setWastage(String wastage) { this.wastage = wastage; }
+
+    public String getRemarks() { return remarks; }
+    public void setRemarks(String remarks) { this.remarks = remarks; }
 }

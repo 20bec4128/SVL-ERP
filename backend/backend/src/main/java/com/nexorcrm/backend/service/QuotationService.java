@@ -187,6 +187,15 @@ public class QuotationService {
         r.setNotes(q.getNotes());
         r.setValidityDate(q.getValidityDate());
         r.setStatus(q.getStatus());
+        if (leadSnapshot != null) {
+            r.setLeadStatus(leadSnapshot.getStatus());
+        }
+        if (q.getLeadId() != null) {
+            List<com.nexorcrm.backend.entity.SalesOrder> orders = salesOrderRepository.findByLeadId(q.getLeadId());
+            if (orders != null && !orders.isEmpty()) {
+                r.setSalesOrderStatus(orders.get(orders.size() - 1).getStatus());
+            }
+        }
         r.setCreatedAt(q.getCreatedAt());
         r.setUpdatedAt(q.getUpdatedAt());
         r.setCreatedById(q.getCreatedById());

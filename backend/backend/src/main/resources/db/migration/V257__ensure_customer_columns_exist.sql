@@ -1,0 +1,17 @@
+-- Ensure all required columns exist in the customers table (since the table existed and CREATE TABLE was skipped)
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS customer_id VARCHAR(64) UNIQUE;
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS company_name VARCHAR(200);
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS contact_person VARCHAR(200);
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS email_address VARCHAR(190);
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS mobile_number VARCHAR(40);
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS gst_number VARCHAR(50);
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS billing_address VARCHAR(500);
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS shipping_address VARCHAR(500);
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS pan VARCHAR(20);
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS business_type VARCHAR(100);
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS payment_terms VARCHAR(200);
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS credit_limit DECIMAL(12, 2) DEFAULT 0.00;
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS sales_executive_id BIGINT;
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS source_lead_id BIGINT;
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP;
+ALTER TABLE customers ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP;

@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -127,6 +128,8 @@ public class DealService {
         deal.setStatus(StringUtils.hasText(lead.getStatus()) ? lead.getStatus().trim() : "Deal");
         deal.setRequirementFileName(lead.getRequirementFileName());
         deal.setRequirementFilePath(lead.getRequirementFilePath());
+        deal.setRequirementType(lead.getRequirementType());
+        deal.setRequirementNotes(lead.getRequirementNotes());
         if (deal.getConvertedAt() == null) {
             deal.setConvertedAt(LocalDateTime.now());
         }
@@ -881,8 +884,18 @@ public class DealService {
         r.setProductionAssignedToUserName(productionAssignedToName);
         r.setProductionAssignedToName(productionAssignedToName);
         r.setProductionWorkStatus(deal.getProductionWorkStatus());
-        r.setRequirementType(deal.getRequirementType());
-        r.setRequirementNotes(deal.getRequirementNotes());
+        String reqType = deal.getRequirementType();
+        String reqNotes = deal.getRequirementNotes();
+        if ((reqType == null || reqType.isBlank() || reqNotes == null || reqNotes.isBlank()) && deal.getSourceLeadId() != null) {
+            Optional<Lead> leadOpt = leadRepository.findByIdAndDeletedFalse(deal.getSourceLeadId());
+            if (leadOpt.isPresent()) {
+                Lead lead = leadOpt.get();
+                if (reqType == null || reqType.isBlank()) reqType = lead.getRequirementType();
+                if (reqNotes == null || reqNotes.isBlank()) reqNotes = lead.getRequirementNotes();
+            }
+        }
+        r.setRequirementType(reqType);
+        r.setRequirementNotes(reqNotes);
         r.setRequirementFileName(deal.getRequirementFileName());
         r.setRequirementFilePath(deal.getRequirementFilePath());
         r.setArtworkFileName(deal.getArtworkFileName());

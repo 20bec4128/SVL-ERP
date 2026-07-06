@@ -24,6 +24,7 @@ const STATUS_LABEL_OVERRIDES = {
   "not attempted": "Not Attempted",
   "new lead": "New Lead",
   "new": "New Lead",
+  "converted to customer": "Customer",
 };
 
 export function formatStatusLabel(status) {
@@ -114,6 +115,7 @@ export function getStatusStyle(status) {
   else if (s.includes("delivery")) hex = colors.delivery;
   else if (s.includes("duplicate")) hex = colors.duplicate;
   else if (s.includes("reject")) hex = colors.rejected;
+  else if (s.includes("customer")) hex = colors.deal;
 
   const getReadableTextColor = (colorHex) => {
     const r = parseInt(colorHex.substring(1, 3), 16);

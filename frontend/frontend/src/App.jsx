@@ -8,6 +8,7 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import VendorProtectedRoute from "./routes/VendorProtectedRoute";
 import LoginPage from "./pages/common/LoginPage";
 import VendorLoginPage from "./pages/common/VendorLoginPage";
+import CustomerActivationPage from "./pages/common/CustomerActivationPage";
 import UnauthorizedPage from "./pages/common/UnauthorizedPage";
 import PublicEmployeeFormPage from "./pages/public/PublicEmployeeFormPage";
 import RouteProgress, {
@@ -169,6 +170,7 @@ export default function App() {
       <RouteProgress />
       <Routes>
         <Route path="/employee-form/:token" element={<PublicEmployeeFormPage />} />
+        <Route path="/activate" element={<CustomerActivationPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/vendor-login" element={<VendorLoginPage />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />

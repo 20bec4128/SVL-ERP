@@ -46,6 +46,8 @@ public class QuotationResponse {
     private String notes;
     private LocalDate validityDate;
     private String status;
+    private String leadStatus;
+    private String salesOrderStatus;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<QuotationItemResponse> items;
@@ -160,4 +162,9 @@ public class QuotationResponse {
     public void setApprovedByRole(String approvedByRole) { this.approvedByRole = approvedByRole; }
     public String getApprovalNotes() { return approvalNotes; }
     public void setApprovalNotes(String approvalNotes) { this.approvalNotes = approvalNotes; }
+
+    public String getLeadStatus() { return leadStatus; }
+    public void setLeadStatus(String leadStatus) { this.leadStatus = leadStatus; }
+    public String getSalesOrderStatus() { return salesOrderStatus; }
+    public void setSalesOrderStatus(String salesOrderStatus) { this.salesOrderStatus = salesOrderStatus; }
 }

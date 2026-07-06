@@ -435,4 +435,16 @@ public class AuthService {
         }
         return request.getRemoteAddr();
     }
+
+    public String activateCustomerAccount(String token, String password) {
+        User user = userRepository.findByActivationToken(token)
+                .orElseThrow(() -> new RuntimeException("Invalid or expired activation token"));
+        user.setPasswordHash(passwordEncoder.encode(password));
+        user.setActivationStatus(ActivationStatus.ACTIVE);
+        user.setActive(true);
+        user.setActivationToken(null);
+        userRepository.save(user);
+        auditService.log("CUSTOMER_PORTAL_ACTIVATED", "Customer activated account", user.getEmail());
+        return "Account activated successfully";
+    }
 }

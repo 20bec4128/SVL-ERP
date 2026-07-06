@@ -1,5 +1,5 @@
 // Routes that don't require page-level access checks
-const UNGUARDED_ROUTES = ["/login", "/unauthorized", "/", "/403", "/404"];
+const UNGUARDED_ROUTES = ["/login", "/unauthorized", "/", "/403", "/404", "/activate"];
 
 /**
  * Returns the route key (path) used for page-access checks,
