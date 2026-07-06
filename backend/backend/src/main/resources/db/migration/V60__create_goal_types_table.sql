@@ -1,0 +1,9 @@
+CREATE TABLE IF NOT EXISTS goal_types (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(150) NOT NULL,
+    description VARCHAR(1000),
+    status VARCHAR(20),
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP NOT NULL DEFAULT NOW(),
+    updated_at TIMESTAMP NOT NULL DEFAULT NOW()
+);

@@ -1,0 +1,116 @@
+.lead-import-edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.form-section {
+  border: 1px solid #eef2f7;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  background-color: #fcfcfc;
+}
+
+.section-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #45597a;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #eef2f7;
+}
+
+.form-section .form-label {
+  font-weight: 500;
+  color: #34393f;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.form-section .form-control,
+.form-section .form-select {
+  border-radius: 0.5rem;
+  border: 1px solid #d0d5dd;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.9rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-section .form-control:hover,
+.form-section .form-select:hover {
+  border-color: #45597a;
+  background-color: #f8fafc;
+}
+
+.form-section .form-control:focus,
+.form-section .form-select:focus {
+  border-color: #45597a;
+  box-shadow: 0 0 0 0.2rem rgba(69, 89, 122, 0.15);
+  background-color: #ffffff;
+}
+
+.form-section .form-control:read-only {
+  background-color: #f8f9fa;
+  color: #6c757d;
+  cursor: not-allowed;
+}
+
+.form-section textarea.form-control {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.modal-content {
+  border-radius: 0.75rem;
+  border: 1px solid #d0d5dd;
+}
+
+.modal-header {
+  border-bottom: 1px solid #eef2f7;
+  padding: 1.25rem;
+  background-color: #fcfcfc;
+}
+
+.modal-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #34393f;
+}
+
+.modal-body {
+  padding: 1.5rem;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+.modal-footer {
+  border-top: 1px solid #eef2f7;
+  padding: 1rem;
+  background-color: #fcfcfc;
+}
+
+.modal-footer .btn {
+  border-radius: 0.5rem;
+  padding: 0.5rem 1.25rem;
+  font-weight: 500;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.modal-footer .btn:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .form-section .form-control,
+  .form-section .form-select,
+  .modal-footer .btn {
+    transition: none !important;
+  }
+
+  .modal-footer .btn:hover:not(:disabled) {
+    transform: none;
+    box-shadow: none;
+  }
+}

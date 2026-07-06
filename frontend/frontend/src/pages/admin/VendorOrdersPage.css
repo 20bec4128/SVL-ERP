@@ -1,0 +1,318 @@
+/* ============================================================
+   VendorOrdersPage.css — Exclusive to VendorOrdersPage
+   ============================================================ */
+
+/* ---- Page Header ---- */
+.vo-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.vo-header-left h2 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: #34393f;
+  margin: 0 0 0.15rem 0;
+}
+
+.vo-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.82rem;
+  color: #7a8390;
+}
+
+.vo-breadcrumb a {
+  color: #45597a;
+  text-decoration: none;
+}
+
+.vo-breadcrumb a:hover {
+  text-decoration: underline;
+}
+
+.vo-breadcrumb-sep {
+  color: #c4c9d0;
+}
+
+/* ---- Toolbar ---- */
+.vo-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.vo-search-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.vo-search-wrap i {
+  position: absolute;
+  left: 0.85rem;
+  color: #a0a9b4;
+  font-size: 1rem;
+  pointer-events: none;
+}
+
+.vo-search-input {
+  height: 38px;
+  padding: 0 1rem 0 2.4rem;
+  border: 1px solid #d0d5dd;
+  border-radius: 2rem;
+  background-color: #ffffff;
+  font-size: 0.875rem;
+  color: #34393f;
+  width: 240px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.vo-search-input:focus {
+  outline: none;
+  border-color: #45597a;
+  box-shadow: 0 0 0 0.18rem rgba(69, 89, 122, 0.14);
+}
+
+.vo-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 38px;
+  padding: 0 1.25rem;
+  border-radius: 2rem;
+  background-color: #45597a;
+  color: #ffffff;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border: none;
+  text-decoration: none;
+  transition: background-color 0.18s ease, box-shadow 0.18s ease, transform 0.15s ease;
+  white-space: nowrap;
+}
+
+.vo-add-btn:hover {
+  background-color: #374d6b;
+  color: #ffffff;
+  box-shadow: 0 6px 16px rgba(69, 89, 122, 0.22);
+  transform: translateY(-1px);
+  text-decoration: none;
+}
+
+/* ---- Card ---- */
+.vo-card {
+  background: #ffffff;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 12px rgba(69, 89, 122, 0.08);
+  overflow: hidden;
+}
+
+.vo-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #f0f2f5;
+}
+
+.vo-card-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #34393f;
+  margin: 0;
+}
+
+.vo-count-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.75rem;
+  background-color: #e8edf4;
+  color: #45597a;
+  border-radius: 2rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+/* ---- Table ---- */
+.vo-table-wrap {
+  overflow-x: auto;
+}
+
+.vo-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.vo-table thead tr {
+  background-color: #f8f9fb;
+}
+
+.vo-table thead th {
+  padding: 0.75rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #7a8390;
+  border-bottom: 1px solid #eef0f3;
+  white-space: nowrap;
+}
+
+.vo-table tbody tr {
+  border-bottom: 1px solid #f4f5f7;
+  transition: background-color 0.15s ease;
+}
+
+.vo-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.vo-table tbody tr:hover {
+  background-color: #f8fafc;
+}
+
+.vo-table td {
+  padding: 0.8rem 1rem;
+  vertical-align: middle;
+  color: #34393f;
+  white-space: nowrap;
+}
+
+.vo-row-index {
+  color: #a0a9b4;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+
+.vo-project-name {
+  font-weight: 600;
+  color: #34393f;
+}
+
+.vo-vendor-name {
+  color: #45597a;
+  font-weight: 500;
+}
+
+.vo-muted {
+  color: #a0a9b4;
+  font-size: 0.82rem;
+}
+
+.vo-file-link {
+  color: #45597a;
+  text-decoration: none;
+  font-size: 0.82rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.vo-file-link:hover {
+  text-decoration: underline;
+}
+
+/* ---- Status Badges ---- */
+.vo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.22rem 0.7rem;
+  border-radius: 2rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Order status */
+.vo-badge.status-new        { background: #eef1f6; color: #45597a; }
+.vo-badge.status-draft      { background: #f4f5f7; color: #7a8390; }
+.vo-badge.status-sent       { background: #e8edf9; color: #3557b7; }
+.vo-badge.status-accepted   { background: #e3f5fb; color: #0d7fa5; }
+.vo-badge.status-rejected   { background: #fdecea; color: #c0392b; }
+.vo-badge.status-work-started   { background: #fff4e5; color: #b96a00; }
+.vo-badge.status-acknowledged   { background: #e3f5fb; color: #0d7fa5; }
+.vo-badge.status-in-production  { background: #fff4e5; color: #b96a00; }
+.vo-badge.status-delivered  { background: #e6f9f0; color: #1a7a4a; }
+.vo-badge.status-cancelled  { background: #fdecea; color: #c0392b; }
+
+/* Payment status */
+.vo-badge.pay-pending           { background: #f4f5f7; color: #7a8390; }
+.vo-badge.pay-sent-to-accounts  { background: #e8edf9; color: #3557b7; }
+.vo-badge.pay-advance-paid      { background: #fff4e5; color: #b96a00; }
+.vo-badge.pay-verified          { background: #e6f9f0; color: #1a7a4a; }
+.vo-badge.pay-final-pending     { background: #fdecea; color: #c0392b; }
+
+/* ---- Action Buttons ---- */
+.vo-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.vo-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  height: 30px;
+  padding: 0 0.85rem;
+  border-radius: 2rem;
+  border: none;
+  font-size: 0.78rem;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s ease, box-shadow 0.15s ease, transform 0.12s ease;
+}
+
+.vo-action-btn:hover {
+  transform: translateY(-1px);
+}
+
+.vo-action-btn.send-accounts {
+  background-color: #e8edf9;
+  color: #3557b7;
+}
+
+.vo-action-btn.send-accounts:hover {
+  background-color: #d5ddf5;
+  box-shadow: 0 3px 8px rgba(53, 87, 183, 0.15);
+}
+
+.vo-action-btn.advance-paid {
+  background-color: #45597a;
+  color: #ffffff;
+}
+
+.vo-action-btn.advance-paid:hover {
+  background-color: #374d6b;
+  box-shadow: 0 3px 8px rgba(69, 89, 122, 0.2);
+}
+
+/* ---- Empty / Loading ---- */
+.vo-empty-row td {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: #a0a9b4;
+  font-size: 0.9rem;
+}
+
+/* ---- Reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  .vo-add-btn,
+  .vo-action-btn {
+    transition: none !important;
+  }
+
+  .vo-add-btn:hover,
+  .vo-action-btn:hover {
+    transform: none;
+  }
+}

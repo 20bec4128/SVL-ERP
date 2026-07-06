@@ -1,0 +1,178 @@
+.user-group-wizard {
+  position: relative;
+  width: 100%;
+  min-height: 420px;
+  height: auto;
+  padding: 2rem;
+  background-color: #fcfcfc;
+}
+
+.user-group-wizard.is-edit {
+  min-height: 520px;
+}
+
+.user-group-wizard .wizard-progress-bar {
+  width: 100%;
+  height: 4px;
+  background-color: #e9ecef;
+  margin-bottom: 1.5rem;
+  border-radius: 2px;
+}
+
+.user-group-wizard .wizard-progress {
+  height: 100%;
+  background-color: #45597a;
+  border-radius: 2px;
+  transform-origin: left center;
+}
+
+.user-group-wizard .wizard-circles-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 1.75rem;
+}
+
+.user-group-wizard .wizard-circle-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.user-group-wizard .wizard-circle {
+  width: 5em;
+  height: 5em;
+  border: 2px solid #45597a;
+  background-color: #45597a;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 12px 28px rgba(69, 89, 122, 0.16);
+}
+
+.user-group-wizard .wizard-circle i {
+  font-size: 1.75rem;
+  color: #fcfcfc;
+}
+
+.user-group-wizard .wizard-circle-label {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #34393f;
+  text-align: center;
+}
+
+.user-group-wizard .wizard-step-content {
+  margin: 1.5rem 0;
+}
+
+.user-group-wizard .wizard-form-grid {
+  max-width: 30rem;
+  margin: 0 auto;
+}
+
+.user-group-wizard.is-edit .wizard-form-grid {
+  margin: 0 auto 2rem auto;
+}
+
+.user-group-wizard .wizard-form-grid .form-control,
+.user-group-wizard .wizard-form-grid .form-select,
+.user-group-wizard .member-picker-row .form-select {
+  border-radius: 1.5rem !important;
+  border: 1px solid #d0d5dd !important;
+  padding: 0.5rem 0.9rem !important;
+  font-size: 0.875rem !important;
+  background-color: #ffffff !important;
+  color: #34393f !important;
+  width: 100%;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.user-group-wizard .wizard-form-grid .form-control:hover,
+.user-group-wizard .wizard-form-grid .form-select:hover,
+.user-group-wizard .member-picker-row .form-select:hover {
+  border-color: #45597a !important;
+  background-color: #f8fafc !important;
+}
+
+.user-group-wizard .wizard-form-grid .form-control:focus,
+.user-group-wizard .wizard-form-grid .form-select:focus,
+.user-group-wizard .member-picker-row .form-select:focus {
+  border-color: #45597a !important;
+  box-shadow: 0 0 0 0.2rem rgba(69, 89, 122, 0.15) !important;
+  background-color: #ffffff !important;
+}
+
+.user-group-wizard .team-picker-row,
+.user-group-wizard .member-picker-row {
+  width: 100%;
+  max-width: none;
+}
+
+.user-group-wizard .member-section {
+  margin-top: 2rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #eef2f7;
+}
+
+.user-group-wizard .member-table-wrap {
+  margin-top: 1rem;
+  border: 1px solid #eef2f7;
+  border-radius: 1rem;
+  overflow: hidden;
+  background: #fff;
+}
+
+.user-group-wizard .wizard-nav {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 2rem;
+}
+
+.user-group-wizard .wizard-nav button {
+  border-radius: 2rem;
+  width: 10rem;
+  min-height: 2.5rem;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.user-group-wizard .wizard-nav button:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.08);
+}
+
+.user-group-modal-backdrop {
+  background: rgba(69, 89, 122, 0.22) !important;
+  backdrop-filter: blur(2px);
+}
+
+.user-group-team-badge {
+  transition: filter 0.18s ease;
+}
+
+.user-group-team-badge:hover {
+  filter: brightness(1.03);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .user-group-wizard .wizard-form-grid .form-control,
+  .user-group-wizard .wizard-form-grid .form-select,
+  .user-group-wizard .member-picker-row .form-select,
+  .user-group-wizard .wizard-nav button,
+  .user-group-team-badge {
+    transition: none !important;
+  }
+
+  .user-group-wizard .wizard-nav button:hover {
+    transform: none;
+    box-shadow: none;
+  }
+
+  .user-group-modal-backdrop {
+    backdrop-filter: none;
+  }
+}

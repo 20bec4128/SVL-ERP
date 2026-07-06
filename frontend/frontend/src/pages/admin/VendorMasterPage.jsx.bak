@@ -1,0 +1,730 @@
+import { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
+import {
+  getVendors,
+  createVendor,
+  updateVendor,
+  deleteVendor,
+} from "../../api/vendorsApi";
+import { getStockCategories } from "../../api/stocksApi";
+import { extractApiErrorMessage } from "../../utils/errorMessage";
+import {
+  COUNTRY_CODE_OPTIONS,
+  defaultCountryOption,
+  ensureCountryCodeValue,
+  getCountryOptionByValue,
+  getCountryAllowedLengths,
+  getCountryDisplayMaxLength,
+  sanitizePhoneDigits,
+  validatePhoneNumber,
+} from "../../utils/phoneUtils";
+
+const initialForm = {
+  vendorName: "",
+  contactPerson: "",
+  phone: "",
+  email: "",
+  address: "",
+  materialsSupplied: [],
+  countryCode: defaultCountryOption.value,
+};
+
+const MATERIAL_COLORS = {
+  Paper: "bg-info",
+  Net: "bg-primary",
+  Vinyl: "bg-success",
+  Ink: "bg-warning",
+  Canvas: "bg-secondary",
+  Other: "bg-dark",
+};
+
+const FALLBACK_MATERIAL_OPTIONS = Object.keys(MATERIAL_COLORS);
+
+function MaterialBadges({ materials }) {
+  if (!materials || materials.length === 0) return <span className="text-muted">—</span>;
+  return (
+    <div className="d-flex flex-wrap gap-1">
+      {materials.map((m) => (
+        <span key={m} className={`badge ${MATERIAL_COLORS[m] || "bg-dark"} badge-sm`}>
+          {m}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function MaterialTagSelector({ selected, onChange, options = FALLBACK_MATERIAL_OPTIONS }) {
+  const toggle = (mat) => {
+    if (selected.includes(mat)) {
+      onChange(selected.filter((m) => m !== mat));
+    } else {
+      onChange([...selected, mat]);
+    }
+  };
+
+  return (
+    <div className="d-flex flex-wrap gap-2">
+      {options.map((mat) => {
+        const active = selected.includes(mat);
+        return (
+          <button
+            key={mat}
+            type="button"
+            className={`btn btn-sm ${active ? "btn-primary" : "btn-outline-secondary"}`}
+            onClick={() => toggle(mat)}
+          >
+            {active && <i className="ti ti-check me-1"></i>}
+            {mat}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+export default function VendorMasterPage() {
+  const [rows, setRows] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
+  const [search, setSearch] = useState("");
+  const [form, setForm] = useState(initialForm);
+  const [editForm, setEditForm] = useState(initialForm);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [selectedId, setSelectedId] = useState(null);
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [mobileError, setMobileError] = useState("");
+  const [editMobileError, setEditMobileError] = useState("");
+  const [materialOptions, setMaterialOptions] = useState(FALLBACK_MATERIAL_OPTIONS);
+
+  const handleAddCountryCodeChange = (value) => {
+    setForm((p) => ({
+      ...p,
+      countryCode: ensureCountryCodeValue(value),
+      phone: "",
+    }));
+    setMobileError("");
+    setError("");
+  };
+
+  const handleEditCountryCodeChange = (value) => {
+    setEditForm((p) => ({
+      ...p,
+      countryCode: ensureCountryCodeValue(value),
+      phone: "",
+    }));
+    setEditMobileError("");
+    setError("");
+  };
+
+  const handleAddPhoneChange = (value) => {
+    const option = getCountryOptionByValue(form.countryCode);
+    const lengths = getCountryAllowedLengths(form.countryCode);
+    setForm((p) => ({
+      ...p,
+      phone: sanitizePhoneDigits(value, option?.maxLength, lengths),
+    }));
+    setMobileError("");
+    setError("");
+  };
+
+  const handleEditPhoneChange = (value) => {
+    const option = getCountryOptionByValue(editForm.countryCode);
+    const lengths = getCountryAllowedLengths(editForm.countryCode);
+    setEditForm((p) => ({
+      ...p,
+      phone: sanitizePhoneDigits(value, option?.maxLength, lengths),
+    }));
+    setEditMobileError("");
+    setError("");
+  };
+
+  const load = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const data = await getVendors();
+      setRows(Array.isArray(data) ? data : []);
+    } catch (e) {
+      setRows([]);
+      setError(extractApiErrorMessage(e, "Failed to load vendors"));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadMaterialOptions = async () => {
+    try {
+      const cats = await getStockCategories();
+      const names = Array.isArray(cats)
+        ? cats.map((cat) => (cat?.name || "").trim()).filter(Boolean)
+        : [];
+      if (names.length > 0) {
+        setMaterialOptions(names);
+      }
+    } catch (e) {
+      console.warn("Failed to load material options", e);
+    }
+  };
+
+  useEffect(() => {
+    load();
+    loadMaterialOptions();
+  }, []);
+
+  useEffect(() => {
+    if (!notice) return;
+    const t = setTimeout(() => setNotice(""), 2200);
+    return () => clearTimeout(t);
+  }, [notice]);
+  const filteredRows = useMemo(() => {
+    const q = search.toLowerCase().trim();
+    if (!q) return rows;
+    return rows.filter(
+      (r) =>
+        (r.vendorName || "").toLowerCase().includes(q) ||
+        (r.materialsSupplied || []).some((m) => m.toLowerCase().includes(q))
+    );
+  }, [rows, search]);
+
+  const selectedAddCountry = getCountryOptionByValue(form.countryCode);
+  const selectedEditCountry = getCountryOptionByValue(editForm.countryCode);
+  const addPhoneMaxLen = getCountryDisplayMaxLength(form.countryCode) || selectedAddCountry?.maxLength;
+  const editPhoneMaxLen = getCountryDisplayMaxLength(editForm.countryCode) || selectedEditCountry?.maxLength;
+  const addPhonePattern = addPhoneMaxLen ? `\\d{${addPhoneMaxLen}}` : "\\d*";
+  const editPhonePattern = editPhoneMaxLen ? `\\d{${editPhoneMaxLen}}` : "\\d*";
+
+  const handleAdd = async (e) => {
+    e.preventDefault();
+    if (!form.vendorName.trim()) {
+      setError("Vendor Name is required");
+      return;
+    }
+    const phoneValidation = validatePhoneNumber(form.phone, form.countryCode);
+    if (phoneValidation) {
+      setMobileError(phoneValidation);
+      return;
+    }
+    setSaving(true);
+    setError("");
+    try {
+      await createVendor({
+        vendorName: form.vendorName.trim(),
+        contactPerson: form.contactPerson.trim(),
+        phone: form.phone.trim(),
+        email: form.email.trim(),
+        address: form.address.trim(),
+        materialsSupplied: form.materialsSupplied,
+        countryCode: form.countryCode,
+      });
+      setForm(initialForm);
+      setNotice("Vendor added successfully");
+      setShowAddModal(false);
+      setMobileError("");
+      await load();
+    } catch (e2) {
+      setError(extractApiErrorMessage(e2, "Failed to add vendor"));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const openEdit = (row) => {
+    setEditForm({
+      vendorName: row.vendorName || "",
+      contactPerson: row.contactPerson || "",
+      phone: row.phone || "",
+      email: row.email || "",
+      address: row.address || "",
+      materialsSupplied: row.materialsSupplied || [],
+      countryCode: ensureCountryCodeValue(row.countryCode || defaultCountryOption.value),
+    });
+    setSelectedId(row.id);
+    setShowEditModal(true);
+  };
+
+  const handleEdit = async (e) => {
+    e.preventDefault();
+    if (!selectedId) return;
+    if (!editForm.vendorName.trim()) {
+      setError("Vendor Name is required");
+      return;
+    }
+    const phoneValidation = validatePhoneNumber(editForm.phone, editForm.countryCode);
+    if (phoneValidation) {
+      setEditMobileError(phoneValidation);
+      return;
+    }
+    setSaving(true);
+    setError("");
+    try {
+      await updateVendor(selectedId, {
+        vendorName: editForm.vendorName.trim(),
+        contactPerson: editForm.contactPerson.trim(),
+        phone: editForm.phone.trim(),
+        email: editForm.email.trim(),
+        address: editForm.address.trim(),
+        materialsSupplied: editForm.materialsSupplied,
+        countryCode: editForm.countryCode,
+      });
+      setNotice("Vendor updated successfully");
+      setShowEditModal(false);
+      setEditMobileError("");
+      setSelectedId(null);
+      await load();
+    } catch (e2) {
+      setError(extractApiErrorMessage(e2, "Failed to update vendor"));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const confirmDelete = (row) => {
+    setDeleteTarget(row);
+    setSelectedId(row.id);
+    setShowDeleteModal(true);
+  };
+
+  const handleDelete = async () => {
+    if (!selectedId) return;
+    setSaving(true);
+    setError("");
+    try {
+      await deleteVendor(selectedId);
+      setNotice("Vendor deleted");
+      setShowDeleteModal(false);
+      setSelectedId(null);
+      setDeleteTarget(null);
+      await load();
+    } catch (e2) {
+      setError(extractApiErrorMessage(e2, "Failed to delete vendor"));
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const closeBtn = (
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#000" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <line x1="6" y1="6" x2="18" y2="18" />
+      <line x1="18" y1="6" x2="6" y2="18" />
+    </svg>
+  );
+
+  return (
+    <>
+      <div className="content">
+        {notice && <div className="alert alert-success">{notice}</div>}
+        {error && <div className="alert alert-danger">{error}</div>}
+
+        <div className="d-md-flex d-block align-items-center justify-content-between page-breadcrumb mb-3">
+          <div className="my-auto mb-2">
+            <h2 className="mb-1">Vendor Management</h2>
+            <nav>
+              <ol className="breadcrumb mb-0">
+                <li className="breadcrumb-item">
+                  <Link to="/admin-dashboard">
+                    <i className="ti ti-smart-home"></i>
+                  </Link>
+                </li>
+                <li className="breadcrumb-item">
+                  <Link to="/stocks/vendors">Vendor Management</Link>
+                </li>
+                <li className="breadcrumb-item active">Vendors</li>
+              </ol>
+            </nav>
+          </div>
+          <div className="d-flex align-items-center gap-2 mb-2">
+            <input
+              type="text"
+              className="form-control"
+              placeholder="Search vendor or material..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              style={{ maxWidth: 260 }}
+            />
+            <button
+              type="button"
+              className="btn btn-primary d-flex align-items-center"
+              onClick={() => {
+                setForm(initialForm);
+                setShowAddModal(true);
+              }}
+            >
+              <i className="ti ti-circle-plus me-2"></i>Add Vendor
+            </button>
+          </div>
+        </div>
+
+        <div className="card">
+          <div className="card-header d-flex align-items-center justify-content-between">
+            <h5 className="mb-0">Vendor List</h5>
+            <span className="badge bg-primary">{filteredRows.length} vendor{filteredRows.length !== 1 ? "s" : ""}</span>
+          </div>
+          <div className="card-body p-0">
+            <div className="custom-datatable-filter table-responsive">
+              <table className="table">
+                <thead className="thead-light">
+                  <tr>
+                    <th>#</th>
+                    <th>Vendor Name</th>
+                    <th>Contact Person</th>
+                    <th>Phone</th>
+                    <th>Country</th>
+                    <th>Email</th>
+                    <th>Address</th>
+                    <th>Materials Supplied</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {loading ? (
+                    <tr>
+                      <td colSpan={9}>Loading...</td>
+                    </tr>
+                  ) : filteredRows.length === 0 ? (
+                    <tr>
+                      <td colSpan={9}>No vendors found</td>
+                    </tr>
+                  ) : (
+                    filteredRows.map((row, idx) => (
+                      <tr key={row.id}>
+                        <td>{idx + 1}</td>
+                        <td className="fw-semibold">{row.vendorName || "—"}</td>
+                        <td>{row.contactPerson || "—"}</td>
+                        <td>{row.phone || "—"}</td>
+                        <td>{row.countryCode || defaultCountryOption.value}</td>
+                        <td>{row.email || "—"}</td>
+                        <td>{row.address || "—"}</td>
+                        <td>
+                          <MaterialBadges materials={row.materialsSupplied} />
+                        </td>
+                        <td>
+                          <div className="action-icon d-inline-flex">
+                            <button
+                              type="button"
+                              className="btn btn-link p-0 me-2"
+                              onClick={() => openEdit(row)}
+                              aria-label="Edit vendor"
+                            >
+                              <i className="ti ti-edit"></i>
+                            </button>
+                            <button
+                              type="button"
+                              className="btn btn-link p-0 text-danger"
+                              onClick={() => confirmDelete(row)}
+                              aria-label="Delete vendor"
+                            >
+                              <i className="ti ti-trash"></i>
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Add Vendor Modal */}
+      {showAddModal && (
+        <>
+          <div className="modal fade show" style={{ display: "block" }} tabIndex="-1">
+            <div className="modal-dialog modal-dialog-centered modal-lg">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h4 className="modal-title">Add Vendor</h4>
+                  <button type="button" className="btn-close custom-btn-close" onClick={() => setShowAddModal(false)}>
+                    {closeBtn}
+                  </button>
+                </div>
+                <form onSubmit={handleAdd}>
+                  <div className="modal-body pb-0">
+                    <div className="row">
+                      <div className="col-md-6">
+                        <div className="mb-3">
+                          <label className="form-label">
+                            Vendor Name <span className="text-danger">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={form.vendorName}
+                            onChange={(e) => setForm((p) => ({ ...p, vendorName: e.target.value }))}
+                          />
+                        </div>
+                      </div>
+                      <div className="col-md-6">
+                        <div className="mb-3">
+                          <label className="form-label">Contact Person</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={form.contactPerson}
+                            onChange={(e) => setForm((p) => ({ ...p, contactPerson: e.target.value }))}
+                          />
+                        </div>
+                      </div>
+                      <div className="col-md-6">
+                        <div className="mb-3">
+                          <label className="form-label">Country Code</label>
+                          <select
+                            className="form-select"
+                            value={form.countryCode}
+                            onChange={(e) => handleAddCountryCodeChange(e.target.value)}
+                          >
+                            {COUNTRY_CODE_OPTIONS.map((option) => (
+                              <option key={`${option.country}-${option.callingCode}`} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                      <div className="col-md-6">
+                        <div className="mb-3">
+                          <label className="form-label">
+                            Mobile Number <span className="text-danger">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            pattern={addPhonePattern}
+                            minLength={addPhoneMaxLen || undefined}
+                            title={addPhoneMaxLen ? `Enter exactly ${addPhoneMaxLen} digits` : "Enter numeric value"}
+                            className="form-control"
+                            value={form.phone}
+                            maxLength={addPhoneMaxLen}
+                            onChange={(e) => handleAddPhoneChange(e.target.value)}
+                          />
+                          <div className="d-flex justify-content-between mt-1">
+                            <small className="text-muted">
+                              {addPhoneMaxLen
+                                ? `${addPhoneMaxLen} digits required`
+                                : "Numeric value"}
+                            </small>
+                            {mobileError && <small className="text-danger">{mobileError}</small>}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-md-6">
+                        <div className="mb-3">
+                          <label className="form-label">Email</label>
+                          <input
+                            type="email"
+                            className="form-control"
+                            value={form.email}
+                            onChange={(e) => setForm((p) => ({ ...p, email: e.target.value }))}
+                          />
+                        </div>
+                      </div>
+                      <div className="col-md-12">
+                        <div className="mb-3">
+                          <label className="form-label">Address</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={form.address}
+                            onChange={(e) => setForm((p) => ({ ...p, address: e.target.value }))}
+                          />
+                        </div>
+                      </div>
+                      <div className="col-md-12">
+                        <div className="mb-3">
+                          <label className="form-label">Materials Supplied</label>
+                          <MaterialTagSelector
+                            selected={form.materialsSupplied}
+                            options={materialOptions}
+                            onChange={(mats) => setForm((p) => ({ ...p, materialsSupplied: mats }))}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="modal-footer">
+                    <button type="button" className="btn btn-light me-2" onClick={() => setShowAddModal(false)}>
+                      Cancel
+                    </button>
+                    <button type="submit" className="btn btn-primary" disabled={saving}>
+                      {saving ? "Adding..." : "Add Vendor"}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          <div className="modal-backdrop fade show" />
+        </>
+      )}
+
+      {/* Edit Vendor Modal */}
+      {showEditModal && (
+        <>
+          <div className="modal fade show" style={{ display: "block" }} tabIndex="-1">
+            <div className="modal-dialog modal-dialog-centered modal-lg">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h4 className="modal-title">Edit Vendor</h4>
+                  <button type="button" className="btn-close custom-btn-close" onClick={() => setShowEditModal(false)}>
+                    {closeBtn}
+                  </button>
+                </div>
+                <form onSubmit={handleEdit}>
+                  <div className="modal-body pb-0">
+                    <div className="row">
+                      <div className="col-md-6">
+                        <div className="mb-3">
+                          <label className="form-label">
+                            Vendor Name <span className="text-danger">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={editForm.vendorName}
+                            onChange={(e) => setEditForm((p) => ({ ...p, vendorName: e.target.value }))}
+                          />
+                        </div>
+                      </div>
+                      <div className="col-md-6">
+                        <div className="mb-3">
+                          <label className="form-label">Contact Person</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={editForm.contactPerson}
+                            onChange={(e) => setEditForm((p) => ({ ...p, contactPerson: e.target.value }))}
+                          />
+                        </div>
+                      </div>
+                      <div className="col-md-6">
+                        <div className="mb-3">
+                          <label className="form-label">Country Code</label>
+                          <select
+                            className="form-select"
+                            value={editForm.countryCode}
+                            onChange={(e) => handleEditCountryCodeChange(e.target.value)}
+                          >
+                            {COUNTRY_CODE_OPTIONS.map((option) => (
+                              <option key={`${option.country}-${option.callingCode}`} value={option.value}>
+                                {option.label}
+                              </option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
+                      <div className="col-md-6">
+                        <div className="mb-3">
+                          <label className="form-label">
+                            Mobile Number <span className="text-danger">*</span>
+                          </label>
+                          <input
+                            type="text"
+                            inputMode="numeric"
+                            pattern={editPhonePattern}
+                            minLength={editPhoneMaxLen || undefined}
+                            title={editPhoneMaxLen ? `Enter exactly ${editPhoneMaxLen} digits` : "Enter numeric value"}
+                            className="form-control"
+                            value={editForm.phone}
+                            maxLength={editPhoneMaxLen}
+                            onChange={(e) => handleEditPhoneChange(e.target.value)}
+                          />
+                          <div className="d-flex justify-content-between mt-1">
+                            <small className="text-muted">
+                              {editPhoneMaxLen
+                                ? `${editPhoneMaxLen} digits required`
+                                : "Numeric value"}
+                            </small>
+                            {editMobileError && <small className="text-danger">{editMobileError}</small>}
+                          </div>
+                        </div>
+                      </div>
+                      <div className="col-md-6">
+                        <div className="mb-3">
+                          <label className="form-label">Email</label>
+                          <input
+                            type="email"
+                            className="form-control"
+                            value={editForm.email}
+                            onChange={(e) => setEditForm((p) => ({ ...p, email: e.target.value }))}
+                          />
+                        </div>
+                      </div>
+                      <div className="col-md-12">
+                        <div className="mb-3">
+                          <label className="form-label">Address</label>
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={editForm.address}
+                            onChange={(e) => setEditForm((p) => ({ ...p, address: e.target.value }))}
+                          />
+                        </div>
+                      </div>
+                      <div className="col-md-12">
+                        <div className="mb-3">
+                          <label className="form-label">Materials Supplied</label>
+                          <MaterialTagSelector
+                            selected={editForm.materialsSupplied}
+                            options={materialOptions}
+                            onChange={(mats) => setEditForm((p) => ({ ...p, materialsSupplied: mats }))}
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="modal-footer">
+                    <button type="button" className="btn btn-light me-2" onClick={() => setShowEditModal(false)}>
+                      Cancel
+                    </button>
+                    <button type="submit" className="btn btn-primary" disabled={saving}>
+                      {saving ? "Saving..." : "Save Changes"}
+                    </button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+          <div className="modal-backdrop fade show" />
+        </>
+      )}
+
+      {/* Delete Confirmation Modal */}
+      {showDeleteModal && (
+        <>
+          <div className="modal fade show" style={{ display: "block" }} tabIndex="-1">
+            <div className="modal-dialog modal-dialog-centered">
+              <div className="modal-content">
+                <div className="modal-header">
+                  <h4 className="modal-title">Confirm Delete</h4>
+                  <button type="button" className="btn-close custom-btn-close" onClick={() => setShowDeleteModal(false)}>
+                    {closeBtn}
+                  </button>
+                </div>
+                <div className="modal-body">
+                  <p>
+                    Are you sure you want to delete
+                    {deleteTarget?.vendorName ? ` "${deleteTarget.vendorName}"` : " this vendor"}?
+                  </p>
+                </div>
+                <div className="modal-footer">
+                  <button type="button" className="btn btn-light me-2" onClick={() => setShowDeleteModal(false)}>
+                    Cancel
+                  </button>
+                  <button type="button" className="btn btn-danger" onClick={handleDelete} disabled={saving}>
+                    {saving ? "Deleting..." : "Delete"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="modal-backdrop fade show" />
+        </>
+      )}
+    </>
+  );
+}

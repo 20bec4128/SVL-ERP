@@ -1,0 +1,2 @@
+ALTER TABLE leads
+    ADD COLUMN IF NOT EXISTS boq_notes TEXT;

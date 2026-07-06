@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/assets/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="/assets/css/feather.css" />
+    <link rel="stylesheet" href="/assets/plugins/tabler-icons/tabler-icons.css" />
+    <link
+      rel="stylesheet"
+      href="/assets/plugins/@simonwep/pickr/themes/nano.min.css"
+    />
+    <link rel="stylesheet" href="/assets/css/style.css" />
+    <link rel="stylesheet" href="/assets/css/custom.css" />
+    <title>ERP Frontend</title>
+    <script type="module" crossorigin src="/assets/index-CZnSj54K.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/index-auA7jVbn.css">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script src="/assets/js/jquery-3.7.1.min.js"></script>
+    <script src="/assets/js/bootstrap.bundle.min.js"></script>
+    <script src="/assets/js/feather.min.js"></script>
+    <script src="/assets/js/jquery.slimscroll.min.js"></script>
+    <script src="/assets/js/script.js"></script>
+    <script src="/assets/plugins/@simonwep/pickr/pickr.min.js"></script>
+    <script src="/assets/js/theme-script.js"></script>
+    <script src="/assets/js/theme-colorpicker.js"></script>
+  </body>
+</html>

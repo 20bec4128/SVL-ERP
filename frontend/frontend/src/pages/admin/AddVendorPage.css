@@ -1,0 +1,319 @@
+/* ============================================================
+   AddVendorPage.css — Vendor Wizard UI (exclusive to AddVendorPage)
+   ============================================================ */
+
+.vendor-wizard {
+  position: relative;
+  width: 100%;
+  min-height: 500px;
+  height: auto;
+  padding: 0rem 2rem 2rem 2rem;
+  background-color: #fcfcfc;
+}
+
+/* ---- Progress Bar ---- */
+.vendor-wizard .wizard-progress-bar {
+  width: 100%;
+  height: 4px;
+  background-color: #e9ecef;
+  margin-bottom: 1.5rem;
+  border-radius: 2px;
+}
+
+.vendor-wizard .wizard-progress {
+  height: 100%;
+  background-color: #45597a;
+  border-radius: 2px;
+  transform-origin: left center;
+}
+
+/* ---- Step Circles ---- */
+.vendor-wizard .wizard-circles-container {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 1.5rem;
+  position: relative;
+}
+
+.vendor-wizard .wizard-circles-container::before {
+  content: '';
+  position: absolute;
+  top: 1.5em;
+  left: 8%;
+  right: 8%;
+  height: 2px;
+  background: #45597a;
+  z-index: 0;
+}
+
+.vendor-wizard .wizard-circle-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+}
+
+.vendor-wizard .wizard-circle {
+  width: 3rem;
+  height: 3rem;
+  border: 2px solid #45597a;
+  background-color: #fcfcfc;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s ease all;
+}
+
+.vendor-wizard .wizard-circle i {
+  font-size: 1.75rem;
+  color: #45597a;
+}
+
+.vendor-wizard .wizard-circle.active {
+  background-color: #45597a !important;
+  box-shadow: 0 12px 28px rgba(69, 89, 122, 0.16);
+}
+
+.vendor-wizard .wizard-circle.active i {
+  color: #fcfcfc !important;
+}
+
+.vendor-wizard .wizard-circle-label {
+  margin-top: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #34393f;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* ---- Step Content ---- */
+.vendor-wizard .wizard-step-content {
+  min-height: 250px;
+  margin: 2rem 0;
+}
+
+/* ---- Inputs ---- */
+.vendor-wizard-input {
+  border-radius: 2rem !important;
+  border: 1px solid #d0d5dd !important;
+  padding: 0.6rem 1rem !important;
+  font-size: 0.95rem !important;
+  background-color: #ffffff !important;
+  color: #34393f !important;
+  width: 100%;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+
+.vendor-wizard-input:hover {
+  border-color: #45597a !important;
+  background-color: #f8fafc !important;
+}
+
+.vendor-wizard-input:focus {
+  border-color: #45597a !important;
+  box-shadow: 0 0 0 0.2rem rgba(69, 89, 122, 0.15) !important;
+  background-color: #ffffff !important;
+  outline: none;
+}
+
+/* Select needs slightly different border-radius for appearance */
+select.vendor-wizard-input {
+  border-radius: 2rem !important;
+  padding-right: 2rem !important;
+}
+
+textarea.vendor-wizard-input {
+  border-radius: 0.75rem !important;
+  min-height: 80px;
+}
+
+/* ---- Multi-select badge tags ---- */
+.vendor-wizard .wizard-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  margin-top: 0.5rem;
+}
+
+.vendor-wizard .wizard-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background-color: #e8edf4;
+  color: #45597a;
+  border-radius: 2rem;
+  padding: 0.2rem 0.65rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+.vendor-wizard .wizard-tag i {
+  font-size: 0.75rem;
+  cursor: pointer;
+  color: #45597a;
+  opacity: 0.7;
+  transition: opacity 0.15s ease;
+}
+
+.vendor-wizard .wizard-tag i:hover {
+  opacity: 1;
+}
+
+/* ---- Navigation Buttons ---- */
+.vendor-wizard .wizard-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 2rem;
+}
+
+.vendor-wizard .wizard-nav button {
+  border-radius: 2rem;
+  width: 10rem;
+  min-height: 2.5rem;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+
+.vendor-wizard .wizard-nav button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(15, 23, 42, 0.08);
+}
+
+.vendor-wizard .wizard-nav-spacer {
+  flex: 1;
+}
+
+/* ---- Step section heading ---- */
+.vendor-wizard .wizard-section-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #45597a;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 1.25rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid #e9ecef;
+}
+
+/* ---- Phone field (combined country code + number) ---- */
+.vendor-phone-field {
+  position: relative;
+  width: 100%;
+}
+
+.vendor-phone-input-wrap {
+  display: flex;
+  gap: 0.25rem;
+  width: 100%;
+}
+
+.vendor-phone-code-trigger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.45rem;
+  height: 40px;
+  padding: 0 1rem;
+  border: 1px solid #d0d5dd;
+  border-radius: 2rem;
+  background-color: #ffffff;
+  cursor: pointer;
+  min-width: 110px;
+  max-width: 130px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.95rem;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.vendor-phone-code-trigger:hover {
+  border-color: #45597a;
+  background-color: #f8fafc;
+}
+
+.vendor-phone-number-input {
+  flex: 1;
+  height: 40px;
+  min-width: 0;
+  padding: 0 1rem;
+  border: 1px solid #d0d5dd;
+  border-radius: 2rem;
+  background-color: #ffffff;
+  font-size: 0.95rem;
+  box-sizing: border-box;
+  transition: border-color 0.2s ease;
+  color: #34393f;
+}
+
+.vendor-phone-number-input:focus {
+  outline: none;
+  border-color: #45597a;
+  box-shadow: 0 0 0 0.2rem rgba(69, 89, 122, 0.15);
+}
+
+.vendor-phone-code-menu {
+  position: absolute;
+  top: calc(100% + 0.35rem);
+  left: 0;
+  background-color: #ffffff;
+  border: 1px solid #d0d5dd;
+  border-radius: 0.5rem;
+  max-height: 260px;
+  overflow-y: auto;
+  z-index: 200;
+  min-width: 200px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.vendor-phone-code-option {
+  display: block;
+  width: 100%;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  padding: 0.6rem 1rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  color: #34393f;
+  transition: background-color 0.15s ease;
+}
+
+.vendor-phone-code-option:hover {
+  background-color: #f8fafc;
+}
+
+.vendor-phone-code-option.is-active {
+  background-color: #e8edf4;
+  color: #45597a;
+  font-weight: 600;
+}
+
+.vendor-phone-code-empty {
+  padding: 0.75rem 1rem;
+  text-align: center;
+  color: #999;
+  font-size: 0.875rem;
+}
+
+/* ---- Reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  .vendor-wizard-input,
+  .vendor-wizard .wizard-nav button,
+  .vendor-wizard .wizard-circle {
+    transition: none !important;
+  }
+
+  .vendor-wizard .wizard-nav button:hover:not(:disabled) {
+    transform: none;
+    box-shadow: none;
+  }
+}

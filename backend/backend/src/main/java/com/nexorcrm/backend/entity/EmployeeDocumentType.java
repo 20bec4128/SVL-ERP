@@ -1,0 +1,17 @@
+package com.nexorcrm.backend.entity;
+
+public enum EmployeeDocumentType {
+    PHOTO,
+    RESUME,
+    CERTIFICATE,
+    CANDIDATE_PHOTO,
+    AADHAAR_CARD,
+    PAN_CARD,
+    BANK_PASSBOOK,
+    EXPERIENCE_CERTIFICATE,
+    GRADUATION_CERTIFICATE,
+    GRADUATION_MARKSHEET,
+    HSC_MARKSHEET,
+    SSLC_MARKSHEET,
+    COMMUNITY_CERTIFICATE
+}

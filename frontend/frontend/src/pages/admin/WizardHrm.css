@@ -1,0 +1,140 @@
+.hrm-wizard-shell .modal-dialog {
+  width: calc(100% - 2rem);
+  margin: 1rem auto;
+}
+
+.hrm-wizard-shell .modal-dialog.modal-md {
+  max-width: 560px;
+}
+
+.hrm-wizard-shell .modal-content {
+  border: 0;
+  border-radius: 0.875rem;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  background: #ffffff;
+}
+
+.hrm-wizard-shell .modal-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #f0f2f5;
+  flex-shrink: 0;
+}
+
+.hrm-wizard-shell .modal-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #34393f;
+}
+
+.hrm-wizard-shell .modal-body {
+  padding: 1.15rem 1.25rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.hrm-wizard-shell .modal-footer {
+  padding: 0.85rem 1.25rem 1rem;
+  border-top: 1px solid #f0f2f5;
+  gap: 0.5rem;
+  flex-shrink: 0;
+}
+
+.hrm-wizard-shell .form-label {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #34393f;
+  margin-bottom: 0.25rem;
+}
+
+.hrm-wizard-shell .form-control,
+.hrm-wizard-shell .form-select,
+.hrm-wizard-shell textarea.form-control {
+  min-height: 2.5rem;
+  padding: 0.55rem 0.85rem;
+  font-size: 0.92rem;
+  border-radius: 2rem;
+  border-color: #d0d5dd;
+}
+
+.hrm-wizard-shell .form-control:focus,
+.hrm-wizard-shell .form-select:focus,
+.hrm-wizard-shell textarea.form-control:focus {
+  border-color: #45597a;
+  box-shadow: 0 0 0 3px rgba(69, 89, 122, 0.12);
+}
+
+.hrm-wizard-shell .row {
+  --bs-gutter-x: 1rem;
+  --bs-gutter-y: 0.75rem;
+}
+
+.hrm-wizard-shell .mb-3 {
+  margin-bottom: 0.9rem !important;
+}
+
+.hrm-wizard-shell .modal-header .btn-close,
+.hrm-wizard-shell .modal-header .custom-btn-close {
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  margin: 0;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: 50%;
+  background-color: #f3f5f8;
+  background-image: none;
+  box-shadow: none;
+  color: transparent;
+  font-size: 0;
+  line-height: 0;
+  text-indent: -9999px;
+  overflow: hidden;
+  white-space: nowrap;
+  opacity: 1;
+  position: relative;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.hrm-wizard-shell .modal-header .btn-close::before,
+.hrm-wizard-shell .modal-header .custom-btn-close::before {
+  content: "\00d7";
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  text-indent: 0;
+  white-space: normal;
+  overflow: visible;
+  color: #111827;
+  font-size: 1.35rem;
+  line-height: 1;
+  font-weight: 600;
+}
+
+.hrm-wizard-shell .modal-header .btn-close:hover,
+.hrm-wizard-shell .modal-header .custom-btn-close:hover {
+  background-color: #e8edf4;
+}
+
+.hrm-wizard-shell .modal-footer .btn {
+  min-width: 96px;
+  border-radius: 0.75rem;
+}
+
+@media (max-width: 768px) {
+  .hrm-wizard-shell .modal-dialog {
+    width: calc(100% - 1rem);
+    max-width: none;
+  }
+
+  .hrm-wizard-shell .modal-header,
+  .hrm-wizard-shell .modal-body,
+  .hrm-wizard-shell .modal-footer {
+    padding-left: 0.85rem;
+    padding-right: 0.85rem;
+  }
+}

@@ -1,0 +1,17 @@
+ALTER TABLE quotations
+  ADD COLUMN IF NOT EXISTS status_before_verify          VARCHAR(50)  NULL,
+  ADD COLUMN IF NOT EXISTS created_by_id                 BIGINT       NULL,
+  ADD COLUMN IF NOT EXISTS created_by_name               VARCHAR(255) NULL,
+  ADD COLUMN IF NOT EXISTS created_by_email              VARCHAR(255) NULL,
+  ADD COLUMN IF NOT EXISTS created_by_role               VARCHAR(40)  NULL,
+  ADD COLUMN IF NOT EXISTS created_by_team               VARCHAR(160) NULL,
+  ADD COLUMN IF NOT EXISTS verification_requested_at     TIMESTAMP    NULL,
+  ADD COLUMN IF NOT EXISTS verification_requested_by_id  BIGINT       NULL,
+  ADD COLUMN IF NOT EXISTS verification_requested_by_name VARCHAR(255) NULL,
+  ADD COLUMN IF NOT EXISTS verification_requested_by_role VARCHAR(40)  NULL,
+  ADD COLUMN IF NOT EXISTS verification_request_notes    TEXT         NULL,
+  ADD COLUMN IF NOT EXISTS approved_at                   TIMESTAMP    NULL,
+  ADD COLUMN IF NOT EXISTS approved_by_id                BIGINT       NULL,
+  ADD COLUMN IF NOT EXISTS approved_by_name              VARCHAR(255) NULL,
+  ADD COLUMN IF NOT EXISTS approved_by_role              VARCHAR(40)  NULL,
+  ADD COLUMN IF NOT EXISTS approval_notes                TEXT         NULL;

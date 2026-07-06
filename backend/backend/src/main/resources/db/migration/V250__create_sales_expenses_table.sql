@@ -1,0 +1,10 @@
+CREATE TABLE sales_expenses (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(150) NOT NULL,
+    date VARCHAR(60) NOT NULL,
+    method VARCHAR(60) NOT NULL,
+    amount DOUBLE PRECISION NOT NULL DEFAULT 0.0,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL
+);

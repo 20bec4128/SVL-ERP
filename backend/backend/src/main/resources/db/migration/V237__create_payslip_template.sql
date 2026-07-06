@@ -1,0 +1,21 @@
+CREATE TABLE payslip_template (
+    id BIGSERIAL PRIMARY KEY,
+    company_name VARCHAR(200),
+    company_tagline VARCHAR(300),
+    address TEXT,
+    phone1 VARCHAR(30),
+    phone2 VARCHAR(30),
+    work_phone VARCHAR(30),
+    email VARCHAR(200),
+    website VARCHAR(200),
+    gstin VARCHAR(20),
+    udyam_number VARCHAR(50),
+    logo_base64 TEXT,
+    top_image_base64 TEXT,
+    bottom_image_base64 TEXT,
+    prepared_by_default VARCHAR(200),
+    verified_by_default VARCHAR(200),
+    received_by_default VARCHAR(200),
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL
+);

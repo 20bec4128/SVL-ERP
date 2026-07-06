@@ -1,0 +1,114 @@
+:root {
+  --loading-spinner-outer: #32afa9;
+  --loading-spinner-middle: #f17362;
+  --loading-spinner-inner: #7e0cf5;
+}
+
+@keyframes loading-spinner-rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-spinner,
+.spinner-border {
+  --spinner-size: 1.5rem;
+  --spinner-border-width: 3px;
+  --spinner-gap-1: clamp(2px, calc(var(--spinner-size) * 0.07), 5px);
+  --spinner-gap-2: clamp(4px, calc(var(--spinner-size) * 0.17), 12px);
+
+  width: var(--spinner-size);
+  height: var(--spinner-size);
+  display: inline-block;
+  position: relative;
+  vertical-align: middle;
+  box-sizing: border-box;
+  background: transparent;
+  border: 0;
+  border-top: var(--spinner-border-width) solid var(--loading-spinner-outer);
+  border-radius: 50%;
+  animation: loading-spinner-rotate 2s linear infinite;
+  filter: drop-shadow(0 0 10px rgba(50, 175, 169, 0.15));
+  color: transparent !important;
+}
+
+.loading-spinner::before,
+.spinner-border::before {
+  content: "";
+  position: absolute;
+  inset: var(--spinner-gap-1);
+  box-sizing: border-box;
+  border-right: 0;
+  border-bottom: 0;
+  border-left: 0;
+  border-top: var(--spinner-border-width) solid var(--loading-spinner-middle);
+  border-radius: 50%;
+  animation: loading-spinner-rotate 2s linear infinite;
+}
+
+.loading-spinner::after,
+.spinner-border::after {
+  content: "";
+  position: absolute;
+  inset: var(--spinner-gap-2);
+  box-sizing: border-box;
+  border-right: 0;
+  border-bottom: 0;
+  border-left: 0;
+  border-top: var(--spinner-border-width) solid var(--loading-spinner-inner);
+  border-radius: 50%;
+  animation: loading-spinner-rotate 1s linear infinite;
+}
+
+.loading-spinner--page {
+  --spinner-size: 7rem;
+  --spinner-border-width: 3px;
+}
+
+.loading-spinner--sm,
+.spinner-border.spinner-border-sm {
+  --spinner-size: 1rem;
+  --spinner-border-width: 2px;
+}
+
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  background: transparent;
+}
+
+.loading-overlay--soft {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(2px);
+}
+
+.loading-spinner-shell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 100%;
+}
+
+@keyframes spin-rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.spin-animation {
+  animation: spin-rotate 0.8s linear infinite;
+  display: inline-block;
+}
+

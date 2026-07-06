@@ -1,0 +1,279 @@
+.quotation-list-backdrop {
+  z-index: 1049;
+  background: rgba(15, 23, 42, 0.26);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.quotation-log-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.quotation-log-card {
+  width: min(680px, 100%);
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 24px 80px rgba(15, 23, 42, 0.22);
+  border: 1px solid rgba(226, 232, 240, 0.95);
+}
+
+.quotation-log-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.25rem;
+  background: linear-gradient(180deg, #f8fbff 0%, #eef4fb 100%);
+  border-bottom: 1px solid #e7edf5;
+}
+
+.quotation-log-subtitle {
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.quotation-log-body {
+  padding: 1rem 1.25rem;
+  overflow-y: auto;
+}
+
+.quotation-log-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.quotation-log-item {
+  padding: 0.95rem 0 1rem;
+  border-bottom: 1px solid #eef2f7;
+}
+
+.quotation-log-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.quotation-log-item-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.quotation-log-item h6 {
+  color: #45597a;
+  font-weight: 700;
+}
+
+.quotation-log-time {
+  color: #64748b;
+  font-size: 0.82rem;
+  white-space: nowrap;
+}
+
+.quotation-log-meta {
+  color: #64748b;
+  font-size: 0.88rem;
+  margin-bottom: 0.35rem;
+}
+
+.quotation-log-details {
+  color: #334155;
+  font-size: 0.92rem;
+  white-space: pre-wrap;
+}
+
+.quotation-log-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.9rem 1.25rem 1.1rem;
+  border-top: 1px solid #e7edf5;
+  background: #fbfdff;
+}
+
+@media (max-width: 640px) {
+  .quotation-log-card {
+    max-height: 88vh;
+    border-radius: 16px;
+  }
+
+  .quotation-log-item-head {
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .quotation-log-time {
+    white-space: normal;
+  }
+}
+
+/* ── Quotation List Responsive Table (Mobile View - Approach 3) ── */
+@media (max-width: 768px) {
+  /* Hide secondary headers and columns on mobile */
+  .col-customer,
+  .col-createdby,
+  .col-sno,
+  .col-select,
+  .col-date,
+  .col-total,
+  .col-notes {
+    display: none !important;
+  }
+
+
+  /* Make sure visible columns fit nicely */
+  .col-qno {
+    width: 30% !important;
+  }
+  .col-status {
+    width: 30% !important;
+  }
+  .col-actions {
+    width: 40% !important;
+    text-align: right !important;
+  }
+
+  /* Hide the desktop action buttons container on mobile */
+  .desktop-actions {
+    display: none !important;
+  }
+
+  /* Show mobile action buttons container */
+  .mobile-actions-container {
+    display: flex !important;
+  }
+
+  /* Show the mobile eye button only on mobile */
+  .mobile-action-view {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 34px !important;
+    height: 34px !important;
+    padding: 0 !important;
+    border-radius: 50% !important;
+    background-color: rgba(69, 89, 122, 0.08) !important;
+    border: none !important;
+    color: #45597a !important;
+  }
+}
+
+/* By default, hide the mobile action views on desktop views */
+.mobile-actions-container,
+.mobile-action-view {
+  display: none !important;
+}
+
+/* Floating Actions dropdown menu styling */
+.floating-actions-menu {
+  background: #ffffff;
+  border: 1px solid #e2e8f0 !important;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1) !important;
+  animation: fadeIn 0.15s ease-out;
+  transform-origin: top right;
+  z-index: 1050 !important;
+}
+
+.floating-actions-menu .dropdown-item {
+  border: none;
+  background: transparent;
+  color: #334155;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  cursor: pointer;
+  width: 100%;
+}
+.floating-actions-menu .dropdown-item:hover {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+.floating-actions-menu .dropdown-item.text-danger:hover {
+  background-color: #fef2f2;
+  color: #ef4444;
+}
+
+.btn-kebab-actions:hover {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Quotation list table: always fills full container width;
+   auto layout redistributes space when columns are hidden */
+.leads-table {
+  width: 100% !important;
+  table-layout: auto !important;
+}
+
+.leads-table th,
+.leads-table td {
+  white-space: normal !important;
+  word-break: break-word !important;
+  overflow-wrap: break-word !important;
+  padding: 8px 10px !important;
+}
+
+.col-select {
+  width: 40px;
+  min-width: 40px;
+}
+
+.col-sno {
+  min-width: 50px;
+  width: 55px;
+}
+
+.col-qno {
+  min-width: 100px;
+  width: 120px;
+}
+
+/* customer / createdby / notes expand to fill freed space */
+.col-customer,
+.col-createdby {
+  min-width: 140px;
+}
+
+.col-status {
+  min-width: 130px;
+  width: 140px;
+}
+
+.col-date {
+  min-width: 90px;
+  width: 110px;
+}
+
+.col-total {
+  min-width: 90px;
+  width: 110px;
+}
+
+.col-notes {
+  min-width: 160px;
+}
+
+.col-actions {
+  min-width: 90px;
+  width: 100px;
+}
+
+

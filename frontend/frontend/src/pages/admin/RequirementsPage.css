@@ -1,0 +1,34 @@
+.leads-search-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 1rem;
+}
+
+.leads-search-box {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: min(100%, 420px);
+  padding: 0.9rem 1rem;
+  border: 1px solid #e8eef5;
+  border-radius: 18px;
+  background: #f8fbfd;
+}
+
+.leads-search-label {
+  color: #10233f;
+  font-weight: 700;
+  min-width: 56px;
+}
+
+.leads-search-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  border-radius: 14px;
+}
+
+@media (max-width: 576px) {
+  .leads-search-box {
+    width: 100%;
+  }
+}

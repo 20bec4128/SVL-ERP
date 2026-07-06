@@ -1,0 +1,5 @@
+ALTER TABLE lead_logs
+    ADD COLUMN IF NOT EXISTS file_name VARCHAR(255);
+
+ALTER TABLE lead_logs
+    ADD COLUMN IF NOT EXISTS file_path VARCHAR(500);

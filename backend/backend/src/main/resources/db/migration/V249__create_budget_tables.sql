@@ -1,0 +1,38 @@
+CREATE TABLE budgets (
+    id BIGSERIAL PRIMARY KEY,
+    title VARCHAR(150) NOT NULL,
+    type VARCHAR(60) NOT NULL,
+    start_date VARCHAR(60) NOT NULL,
+    end_date VARCHAR(60) NOT NULL,
+    total_revenue DOUBLE PRECISION NOT NULL DEFAULT 0.0,
+    total_expense DOUBLE PRECISION NOT NULL DEFAULT 0.0,
+    tax_amount DOUBLE PRECISION NOT NULL DEFAULT 0.0,
+    budget_amount DOUBLE PRECISION NOT NULL DEFAULT 0.0,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL
+);
+
+CREATE TABLE budget_expenses (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(150) NOT NULL,
+    category VARCHAR(120) NOT NULL,
+    sub_category VARCHAR(160) NOT NULL,
+    amount DOUBLE PRECISION NOT NULL DEFAULT 0.0,
+    date VARCHAR(60) NOT NULL,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL
+);
+
+CREATE TABLE budget_revenues (
+    id BIGSERIAL PRIMARY KEY,
+    name VARCHAR(150) NOT NULL,
+    category VARCHAR(120) NOT NULL,
+    sub_category VARCHAR(160) NOT NULL,
+    amount DOUBLE PRECISION NOT NULL DEFAULT 0.0,
+    date VARCHAR(60) NOT NULL,
+    deleted BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP NOT NULL,
+    updated_at TIMESTAMP NOT NULL
+);

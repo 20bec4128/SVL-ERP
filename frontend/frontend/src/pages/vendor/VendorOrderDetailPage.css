@@ -1,0 +1,272 @@
+/* ============================================================
+   VendorOrderDetailPage.css — Vendor order detail, .vovd- prefix
+   ============================================================ */
+
+.vovd-page {
+  padding-bottom: 2rem;
+}
+
+/* ---- Hero ---- */
+.vovd-hero {
+  background: #ffffff;
+  border-radius: 0.875rem;
+  box-shadow: 0 2px 16px rgba(69, 89, 122, 0.09);
+  padding: 1.75rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.vovd-hero-left {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.vovd-hero-icon {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background-color: #e8edf4;
+  color: #45597a;
+  font-size: 1.35rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.vovd-hero-info {
+  min-width: 0;
+}
+
+.vovd-hero-name {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #34393f;
+  margin: 0 0 0.4rem 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vovd-hero-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.vovd-hero-actions {
+  display: flex;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+/* ---- Status badges ---- */
+.vovd-status-badge,
+.vovd-pay-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.28rem 0.8rem;
+  border-radius: 2rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.vovd-status-badge::before,
+.vovd-pay-badge::before {
+  content: "";
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: currentColor;
+  opacity: 0.75;
+}
+
+.vovd-status-badge.new        { background: #f4f5f7; color: #5a6472; }
+.vovd-status-badge.draft      { background: #f4f5f7; color: #5a6472; }
+.vovd-status-badge.sent       { background: #e8edf4; color: #45597a; }
+.vovd-status-badge.accepted   { background: #e8f5e9; color: #2e7d32; }
+.vovd-status-badge.rejected   { background: #ffebee; color: #c62828; }
+.vovd-status-badge.work-started  { background: #e3f2fd; color: #1565c0; }
+.vovd-status-badge.in-production { background: #ede7f6; color: #4527a0; }
+.vovd-status-badge.delivered  { background: #e0f2f1; color: #00695c; }
+.vovd-status-badge.cancelled  { background: #eceff1; color: #455a64; }
+
+.vovd-pay-badge.pending       { background: #fff3e0; color: #e65100; }
+.vovd-pay-badge.advance-paid  { background: #e3f2fd; color: #1565c0; }
+.vovd-pay-badge.paid          { background: #e8f5e9; color: #2e7d32; }
+
+/* ---- Payment note ---- */
+.vovd-pay-note {
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #e65100;
+  margin-top: 0.25rem;
+}
+
+/* ---- Buttons ---- */
+.vovd-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 36px;
+  padding: 0 1.1rem;
+  border-radius: 2rem;
+  border: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.18s, box-shadow 0.18s, transform 0.15s;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.vovd-btn:hover { transform: translateY(-1px); }
+
+.vovd-btn.primary { background-color: #45597a; color: #ffffff; }
+.vovd-btn.primary:hover {
+  background-color: #374d6b;
+  box-shadow: 0 6px 16px rgba(69, 89, 122, 0.24);
+}
+.vovd-btn.light {
+  background-color: #f4f5f7;
+  color: #5a6472;
+  border: 1px solid #d0d5dd;
+}
+.vovd-btn.light:hover { background-color: #e8eaed; }
+
+/* ---- Section grid ---- */
+.vovd-section-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+/* ---- Info cards ---- */
+.vovd-info-card {
+  background: #ffffff;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 12px rgba(69, 89, 122, 0.07);
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.vovd-info-card:last-child { margin-bottom: 0; }
+
+.vovd-card-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #45597a;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding-bottom: 0.6rem;
+  margin-bottom: 1.25rem;
+  border-bottom: 2px solid #e8edf4;
+}
+
+/* ---- Field grid ---- */
+.vovd-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1.5rem;
+}
+
+.vovd-fields.cols-1 { grid-template-columns: 1fr; }
+.vovd-fields.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+
+.vovd-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.vovd-field.full { grid-column: 1 / -1; }
+
+.vovd-field-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #9aa5b4;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.vovd-field-value {
+  font-size: 0.95rem;
+  color: #34393f;
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.vovd-field-value.empty {
+  color: #c8d0da;
+  font-style: italic;
+  font-weight: 400;
+}
+
+/* ---- File row ---- */
+.vovd-file-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin-top: 0.25rem;
+}
+
+.vovd-file-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.28rem 0.85rem;
+  border-radius: 2rem;
+  border: 1px solid #d0d5dd;
+  background: #f4f5f7;
+  color: #45597a;
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background-color 0.15s;
+}
+
+.vovd-file-btn:hover { background: #e8eaed; }
+
+/* ---- Not found ---- */
+.vovd-empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: #7a8a9a;
+}
+
+/* ---- Responsive ---- */
+@media (prefers-reduced-motion: reduce) {
+  .vovd-btn { transition: none !important; }
+  .vovd-btn:hover { transform: none; }
+}
+
+@media (max-width: 900px) {
+  .vovd-section-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 640px) {
+  .vovd-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .vovd-hero-actions { width: 100%; }
+  .vovd-btn { flex: 1; justify-content: center; }
+  .vovd-fields,
+  .vovd-fields.cols-3 { grid-template-columns: 1fr; }
+  .vovd-hero-name { font-size: 1.1rem; }
+}

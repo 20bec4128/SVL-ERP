@@ -1,0 +1,10 @@
+CREATE TABLE IF NOT EXISTS security_disallowed_usernames (
+    id BIGSERIAL PRIMARY KEY,
+    username VARCHAR(80) NOT NULL UNIQUE
+);
+
+CREATE TABLE IF NOT EXISTS security_banned_ips (
+    id BIGSERIAL PRIMARY KEY,
+    ip_address VARCHAR(80) NOT NULL UNIQUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

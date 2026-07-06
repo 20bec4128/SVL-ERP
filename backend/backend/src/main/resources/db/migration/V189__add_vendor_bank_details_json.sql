@@ -1,0 +1,2 @@
+ALTER TABLE vendor
+    ADD COLUMN IF NOT EXISTS bank_details TEXT;

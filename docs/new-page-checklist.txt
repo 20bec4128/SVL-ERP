@@ -1,0 +1,21 @@
+New Page Checklist (Admin)
+
+1) Add the route
+- File: frontend/frontend/src/adminPhpRoutes.js
+- Add a new entry with the path and component name.
+
+2) Add the page key (permission label)
+- File: frontend/frontend/src/constants/pageAccess.js
+- Add a new key under PAGE_ACCESS_OPTIONS (for Group Access UI).
+
+3) Map the route to the page key
+- File: frontend/frontend/src/constants/pageAccess.js
+- Add a ROUTE_ACCESS_RULES entry that maps your route prefix to the key.
+
+4) Grant access
+- In Group Access UI, assign the page key to required groups.
+- SUPER_ADMIN has no restriction.
+
+5) If the page calls backend APIs
+- Ensure those endpoints allow staff roles (not CUSTOMER-only).
+- Add @PreAuthorize checks as needed.

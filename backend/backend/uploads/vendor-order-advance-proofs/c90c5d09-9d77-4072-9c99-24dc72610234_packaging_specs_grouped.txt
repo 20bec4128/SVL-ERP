@@ -1,0 +1,50 @@
+PACKAGING FORM SPECIFICATIONS (BASED ON YOUR PRODUCT LIST)
+
+======================================== GROUP 1: CORRUGATED / ALL BOX
+TYPES (Use this for:) Corrugated Roll, Corrugated Sheet, Universal Box,
+Corrugation Box, Selflock / Mailer / Flap Box, Frame Box, Ice Cream Hole
+Box, Cake Box, Sweet Box, Pastry Box, Pizza Box, Tier Cake Box, Cake
+Base, Plum Box, Brownie Box, Cupcake Box, Bento Box, Jar Cake, Sandwich
+Box, Burger Box, Popcorn Box, Biryani Box, Tray, Monocarton / Branding
+Box
+
+FIELDS: - Length (cm) - Width (cm) - Height (cm) - Box Style (RSC,
+Die-cut, Mailer, Flap) - Ply (Single, 3, 5, 7) - Flute Type (E, B, C,
+BC) - Board GSM - Printing Method (Flexo, Offset, Digital) - Print
+Colours (Plain, 1 colour, 2 colour, CMYK) - Finish (Matte, Glossy, UV,
+Emboss) - Usage Type (Food, Retail, E-commerce, Industrial) - Load
+Capacity (kg) - Add-ons (Partition, Handle, Window) - Dieline Available
+(Yes/No) - Food Safe (Yes/No) - Grease Proof (Yes/No)
+
+======================================== GROUP 2: FOOD CUPS / LIQUID
+PACKAGING (Use this for:) Cup, Juice Cup with Spout, Ice Cream
+
+FIELDS: - Capacity (ml) - Material (Paper, Plastic, Bagasse) - GSM -
+Printing Method - Print Type - Lamination - Lid Type (Flat, Dome,
+Spout) - Food Safe (Yes/No) - Leak Proof (Yes/No)
+
+======================================== GROUP 3: WRAPS / FLEXIBLE FOOD
+ITEMS (Use this for:) Dosa, Shawarma
+
+FIELDS: - Size (mm/cm) - Material (Butter paper, Foil, Paper) - GSM -
+Printing (Yes/No) - Food Safe (Yes/No) - Grease Proof (Yes/No)
+
+======================================== GROUP 4: ACCESSORIES (Use this
+for:) Knife, Wood/Plastic Spoon
+
+FIELDS: - Material (Wood, Plastic) - Size - Type
+(Disposable/Re-usable) - Food Grade (Yes/No)
+
+======================================== GROUP 5: ZIPPER POUCH (Use this
+for:) Zipper Pouch
+
+FIELDS: - Width (mm) - Height (mm) - Gusset (mm) - Material (BOPP,
+PET/PE, Foil) - Layers (2, 3, 4) - Type: 1. Fully Closed 2. With Window
+3. One Side Open 4. Both Side Transparent 5. Without Zipper - Printing
+Method (Digital, Rotogravure, Flexo) - Print Type (Single /
+Multicolour) - Finish (Matte, Glossy) - Zipper (Yes/No) - Tear Notch
+(Yes/No) - Food Grade (Yes/No)
+
+======================================== PRINTING OPTIONS (COMMON)
+======================================== - Single Colour Printing →
+Screen Printing - Multicolour Printing → Digital / Cylinder / Flexo

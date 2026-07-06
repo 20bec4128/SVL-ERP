@@ -1,0 +1,310 @@
+/* ============================================================
+   VendorDetailPage.css — Exclusive to VendorDetailPage
+   ============================================================ */
+
+.vd-page {
+  padding-bottom: 2rem;
+}
+
+/* ---- Hero Card ---- */
+.vd-hero {
+  background: #ffffff;
+  border-radius: 0.875rem;
+  box-shadow: 0 2px 16px rgba(69, 89, 122, 0.09);
+  padding: 1.75rem 2rem;
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.vd-hero-left {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.vd-hero-avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background-color: #e8edf4;
+  color: #45597a;
+  font-size: 1.4rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  text-transform: uppercase;
+  letter-spacing: -0.5px;
+}
+
+.vd-hero-info {
+  min-width: 0;
+}
+
+.vd-hero-name {
+  font-size: 1.45rem;
+  font-weight: 700;
+  color: #34393f;
+  margin: 0 0 0.4rem 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.vd-hero-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.vd-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.85rem;
+  border-radius: 2rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.vd-status-badge::before {
+  content: "";
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: currentColor;
+  opacity: 0.8;
+}
+
+.vd-status-badge.active {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.vd-status-badge.inactive {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.vd-hero-email {
+  font-size: 0.85rem;
+  color: #7a8a9a;
+}
+
+.vd-hero-actions {
+  display: flex;
+  gap: 0.6rem;
+  flex-shrink: 0;
+}
+
+/* ---- Buttons ---- */
+.vd-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  height: 38px;
+  padding: 0 1.2rem;
+  border-radius: 2rem;
+  border: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: none;
+  transition: background-color 0.18s, box-shadow 0.18s, transform 0.15s;
+  white-space: nowrap;
+  font-family: inherit;
+}
+
+.vd-btn:hover {
+  transform: translateY(-1px);
+}
+
+.vd-btn.primary {
+  background-color: #45597a;
+  color: #ffffff;
+}
+
+.vd-btn.primary:hover {
+  background-color: #374d6b;
+  box-shadow: 0 6px 16px rgba(69, 89, 122, 0.24);
+}
+
+.vd-btn.light {
+  background-color: #f4f5f7;
+  color: #5a6472;
+  border: 1px solid #d0d5dd;
+}
+
+.vd-btn.light:hover {
+  background-color: #e8eaed;
+}
+
+/* ---- Section grid (2 columns) ---- */
+.vd-section-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+
+/* ---- Info Cards ---- */
+.vd-info-card {
+  background: #ffffff;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 12px rgba(69, 89, 122, 0.07);
+  padding: 1.5rem;
+  margin-bottom: 1.25rem;
+}
+
+.vd-info-card:last-child {
+  margin-bottom: 0;
+}
+
+.vd-card-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #45597a;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  padding-bottom: 0.6rem;
+  margin-bottom: 1.25rem;
+  border-bottom: 2px solid #e8edf4;
+}
+
+/* ---- Field grid ---- */
+.vd-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem 1.5rem;
+}
+
+.vd-fields.cols-1 {
+  grid-template-columns: 1fr;
+}
+
+.vd-fields.cols-3 {
+  grid-template-columns: 1fr 1fr 1fr;
+}
+
+.vd-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.vd-field.full {
+  grid-column: 1 / -1;
+}
+
+.vd-field-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #9aa5b4;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.vd-field-value {
+  font-size: 0.95rem;
+  color: #34393f;
+  font-weight: 500;
+  word-break: break-word;
+}
+
+.vd-field-value.empty {
+  color: #c8d0da;
+  font-style: italic;
+  font-weight: 400;
+}
+
+.vd-field-value a {
+  color: #45597a;
+  text-decoration: none;
+}
+
+.vd-field-value a:hover {
+  text-decoration: underline;
+}
+
+/* ---- Chips ---- */
+.vd-chip-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.vd-chip {
+  display: inline-flex;
+  align-items: center;
+  background-color: #e8edf4;
+  color: #45597a;
+  border-radius: 2rem;
+  padding: 0.3rem 0.8rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+/* ---- Bank section highlight ---- */
+.vd-info-card.bank .vd-card-title {
+  color: #2e7d9a;
+  border-bottom-color: #ddf0f5;
+}
+
+.vd-info-card.bank {
+  background: linear-gradient(135deg, #fafeff 0%, #f5fbfe 100%);
+  border: 1px solid #d0edf8;
+}
+
+/* ---- Not found state ---- */
+.vd-empty-state {
+  text-align: center;
+  padding: 3rem;
+  color: #7a8a9a;
+}
+
+/* ---- Reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  .vd-btn { transition: none !important; }
+  .vd-btn:hover { transform: none; }
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 900px) {
+  .vd-section-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .vd-hero {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .vd-hero-actions {
+    width: 100%;
+  }
+
+  .vd-btn {
+    flex: 1;
+    justify-content: center;
+  }
+
+  .vd-fields,
+  .vd-fields.cols-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .vd-hero-name {
+    font-size: 1.2rem;
+  }
+}

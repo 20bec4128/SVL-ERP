@@ -1,0 +1,2 @@
+ALTER TABLE vendor
+    DROP COLUMN IF EXISTS user_id;

@@ -1,0 +1,363 @@
+.qt-fields-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.qt-fields-grid-1 {
+  grid-template-columns: 1fr;
+}
+
+.qt-fields-grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.qt-fields-grid-4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.qt-section-space {
+  margin-top: 14px;
+}
+
+.qt-upload-area {
+  position: relative;
+  min-height: 132px;
+  border: 2px dashed #d1d5db;
+  border-radius: 10px;
+  background: #fafafa;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+.qt-upload-area:hover {
+  border-color: #45597a;
+  background: #f8fafc;
+}
+
+.qt-upload-hidden {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.qt-upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  color: #6b7280;
+  pointer-events: none;
+}
+
+.qt-upload-placeholder i {
+  font-size: 24px;
+  color: #45597a;
+}
+
+.qt-upload-placeholder-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #374151;
+}
+
+.qt-upload-helper {
+  font-size: 11px;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.qt-preview-img {
+  display: block;
+  max-width: 100%;
+  object-fit: contain;
+  border-radius: 6px;
+}
+
+.qt-preview-clear {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.72);
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.qt-upload-sections {
+  display: grid;
+  gap: 14px;
+}
+
+.qt-upload-sections-single {
+  grid-template-columns: 1fr;
+}
+
+.qt-upload-block {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.qt-upload-note {
+  font-size: 11px;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.qt-save-alert {
+  border-radius: 10px;
+  padding: 10px 14px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.qt-save-alert.success {
+  background: #ecfdf5;
+  border: 1px solid #a7f3d0;
+  color: #065f46;
+}
+
+.qt-save-alert.error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+
+.qt-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.qt-loading-card {
+  text-align: center;
+  color: #4b5563;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+/* New template management specific styles */
+.qt-list-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+  margin-top: 16px;
+}
+
+.qt-template-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease-in-out;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+.qt-template-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.02);
+  border-color: #cbd5e1;
+}
+
+.qt-template-card.active {
+  border-color: #2563eb;
+  background: #f8fafc;
+}
+
+.qt-template-card.active::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: #2563eb;
+}
+
+.qt-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.qt-template-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+.qt-company-subtitle {
+  font-size: 13px;
+  color: #64748b;
+  margin-bottom: 16px;
+  line-height: 1.4;
+}
+
+.qt-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.qt-status-badge.active {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.qt-status-badge.inactive {
+  background-color: #f1f5f9;
+  color: #475569;
+}
+
+.qt-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 16px;
+  border-top: 1px solid #f1f5f9;
+}
+
+.qt-actions-row {
+  display: flex;
+  gap: 8px;
+}
+
+.qt-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  border: 1px solid transparent;
+}
+
+.qt-btn-primary {
+  background-color: #2563eb;
+  color: #ffffff;
+}
+
+.qt-btn-primary:hover {
+  background-color: #1d4ed8;
+}
+
+.qt-btn-secondary {
+  background-color: #f1f5f9;
+  color: #475569;
+  border-color: #e2e8f0;
+}
+
+.qt-btn-secondary:hover {
+  background-color: #e2e8f0;
+  color: #334155;
+}
+
+.qt-btn-danger {
+  background-color: #fef2f2;
+  color: #dc2626;
+  border-color: #fee2e2;
+}
+
+.qt-btn-danger:hover {
+  background-color: #fee2e2;
+}
+
+.qt-switch-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.qt-switch-label {
+  font-size: 12px;
+  font-weight: 500;
+  color: #475569;
+}
+
+.qt-switch {
+  position: relative;
+  display: inline-block;
+  width: 36px;
+  height: 20px;
+}
+
+.qt-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.qt-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: #cbd5e1;
+  transition: .2s;
+  border-radius: 20px;
+}
+
+.qt-slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .2s;
+  border-radius: 50%;
+}
+
+input:checked + .qt-slider {
+  background-color: #2563eb;
+}
+
+input:checked + .qt-slider:before {
+  transform: translateX(16px);
+}
+
+@media (max-width: 960px) {
+  .qt-fields-grid-3,
+  .qt-fields-grid-4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .qt-fields-grid-1,
+  .qt-fields-grid-3,
+  .qt-fields-grid-4,
+  .qt-upload-sections,
+  .qt-upload-sections-single {
+    grid-template-columns: 1fr;
+  }
+}

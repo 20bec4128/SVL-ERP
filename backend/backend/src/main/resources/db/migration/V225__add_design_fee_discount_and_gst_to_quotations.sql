@@ -1,0 +1,5 @@
+ALTER TABLE quotations
+ADD COLUMN IF NOT EXISTS design_fee_discount_percent NUMERIC(5,2) NOT NULL DEFAULT 0;
+
+ALTER TABLE quotations
+ADD COLUMN IF NOT EXISTS design_fee_gst_percent NUMERIC(5,2) NOT NULL DEFAULT 0;
