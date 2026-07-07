@@ -3,6 +3,7 @@ package com.nexorcrm.backend.controller;
 import com.nexorcrm.backend.entity.Customer;
 import com.nexorcrm.backend.service.CustomerService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -42,5 +43,15 @@ public class CustomerController {
         return customerService.getCustomerById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteCustomer(@PathVariable Long id) {
+        try {
+            customerService.deleteCustomer(id);
+            return ResponseEntity.ok(java.util.Map.of("message", "Customer deleted successfully"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body("Failed to delete customer: " + e.getMessage());
+        }
     }
 }

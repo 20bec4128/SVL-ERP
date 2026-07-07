@@ -23,6 +23,9 @@ import com.nexorcrm.backend.repo.EmployeeRepository;
 import com.nexorcrm.backend.repo.EmailTemplateRepository;
 import com.nexorcrm.backend.repo.SalesOrderRepository;
 import com.nexorcrm.backend.entity.EmailTemplate;
+import com.nexorcrm.backend.entity.ActivationStatus;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.security.access.AccessDeniedException;
 import jakarta.persistence.EntityNotFoundException;
@@ -55,6 +58,10 @@ public class QuotationService {
     private final EmailTemplateRepository emailTemplateRepository;
 
     private final SalesOrderRepository salesOrderRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    @Value("${app.frontend.url:http://localhost:5173}")
+    private String frontendUrl;
 
     public QuotationService(
             QuotationRepository quotationRepository,
@@ -65,7 +72,8 @@ public class QuotationService {
             EmailNotificationService emailNotificationService,
             EmployeeRepository employeeRepository,
             EmailTemplateRepository emailTemplateRepository,
-            SalesOrderRepository salesOrderRepository) {
+            SalesOrderRepository salesOrderRepository,
+            PasswordEncoder passwordEncoder) {
         this.quotationRepository = quotationRepository;
         this.leadRepository = leadRepository;
         this.userRepository = userRepository;
@@ -75,6 +83,7 @@ public class QuotationService {
         this.employeeRepository = employeeRepository;
         this.emailTemplateRepository = emailTemplateRepository;
         this.salesOrderRepository = salesOrderRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public QuotationResponse createQuotation(QuotationRequest request) {
@@ -770,6 +779,22 @@ public class QuotationService {
         if (sendEmail && q.getLeadId() != null) {
             leadRepository.findById(q.getLeadId()).ifPresent(lead -> {
                 if (lead.getEmail() != null && !lead.getEmail().isBlank()) {
+                    String clientEmail = lead.getEmail().trim().toLowerCase(Locale.ROOT);
+                    
+                    // Auto-provision Customer Portal Account (Inactive until converted)
+                    Optional<User> existingUser = userRepository.findByEmailIgnoreCaseAndIsDeletedFalse(clientEmail);
+                    if (!existingUser.isPresent()) {
+                        User user = new User();
+                        user.setUsername(clientEmail);
+                        user.setEmail(clientEmail);
+                        user.setFirstName(q.getClientName() != null ? q.getClientName() : lead.getName());
+                        user.setRole(Role.CUSTOMER);
+                        user.setActivationStatus(ActivationStatus.PENDING);
+                        user.setActive(false);
+                        user.setPasswordHash(passwordEncoder.encode("Customer@123"));
+                        userRepository.save(user);
+                    }
+
                     String subject = "Quotation " + (q.getQuotationNumber() != null ? q.getQuotationNumber() : "") + " - SVL Packaging & Printing";
                     StringBuilder sb = new StringBuilder();
                     sb.append("Dear ").append(q.getClientName() != null ? q.getClientName() : "Customer").append(",\n\n");
@@ -847,6 +872,16 @@ public class QuotationService {
                         fallback.append("\nThank you for choosing SVL.\n\nBest Regards,\nSVL Packaging & Printing Team");
                         mailBody = fallback.toString();
                     }
+
+                    String portalLink = (frontendUrl != null ? frontendUrl : "http://localhost:5173") + "/login";
+                    String loginCredentialsSection = "\n\n" +
+                            "--------------------------------------------------\n" +
+                            "CUSTOMER PORTAL LOGIN DETAILS (Inactive until converted to customer):\n" +
+                            "Link: " + portalLink + "\n" +
+                            "Username: " + clientEmail + "\n" +
+                            "Password: " + "Customer@123" + "\n" +
+                            "--------------------------------------------------\n";
+                    mailBody = mailBody + loginCredentialsSection;
                     
                     if (file != null && !file.isEmpty()) {
                         try {

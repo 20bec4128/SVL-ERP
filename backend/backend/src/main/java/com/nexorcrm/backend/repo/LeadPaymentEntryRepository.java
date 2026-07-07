@@ -7,4 +7,6 @@ import java.util.List;
 public interface LeadPaymentEntryRepository extends JpaRepository<LeadPaymentEntry, Long> {
     List<LeadPaymentEntry> findByLeadId(Long leadId);
     List<LeadPaymentEntry> findBySalesOrderId(Long salesOrderId);
+    java.util.Optional<LeadPaymentEntry> findByReferenceNo(String referenceNo);
+
 }

@@ -250,13 +250,17 @@ function UseradminPage() {
 
   const canSeeUser = (row) => {
     const role = String(currentUser?.role || "").toUpperCase();
+    const targetRole = String(row?.role || "").toUpperCase();
     if (role === "SUPER_ADMIN") return true;
+    if (targetRole === "CUSTOMER") {
+      return ["ADMIN", "MANAGER", "TEAM_LEAD"].includes(role);
+    }
     if (role === "ADMIN") return isSameBranch(row);
     if (role === "MANAGER") {
-      return isSameDepartment(row) && ["TEAM_LEAD", "EMPLOYEE"].includes(String(row?.role || "").toUpperCase());
+      return isSameDepartment(row) && ["TEAM_LEAD", "EMPLOYEE"].includes(targetRole);
     }
     if (role === "TEAM_LEAD") {
-      return isSameTeam(row) && String(row?.role || "").toUpperCase() === "EMPLOYEE";
+      return isSameTeam(row) && targetRole === "EMPLOYEE";
     }
     return false;
   };
@@ -296,6 +300,17 @@ function UseradminPage() {
 
   const filteredRows = useMemo(() => applyFilters(ordered), [ordered, filters, currentRole]);
   const filteredPending = useMemo(() => applyFilters(orderedPending), [orderedPending, filters, currentRole]);
+
+  const getActiveTabRows = () => {
+    if (activeTab === "users") {
+      return filteredRows.filter(r => r.role !== "CUSTOMER");
+    } else if (activeTab === "customers") {
+      return filteredRows.filter(r => r.role === "CUSTOMER");
+    } else if (activeTab === "pending") {
+      return filteredPending;
+    }
+    return [];
+  };
 
   const allowedAssignRoles = useMemo(() => {
     const configured = new Set(ROLE_OPTIONS.map((role) => String(role || "").trim().toUpperCase()));
@@ -362,7 +377,7 @@ function UseradminPage() {
 
   // Selection Checkbox Logic
   const handleSelectAll = (checked) => {
-    const list = activeTab === "users" ? filteredRows : filteredPending;
+    const list = getActiveTabRows();
     if (checked) {
       setSelectedIds(new Set(list.map(r => r.id)));
     } else {
@@ -414,20 +429,22 @@ function UseradminPage() {
 
   // Export methods
   const getTargetRows = () => {
-    const all = activeTab === "users" ? filteredRows : filteredPending;
+    const all = getActiveTabRows();
     return selectedIds.size > 0
       ? all.filter(r => selectedIds.has(r.id))
       : all;
   };
 
+  const isUserOrCustomerTab = () => activeTab === "users" || activeTab === "customers";
+
   const exportExcel = () => {
     const targetRows = getTargetRows();
-    const headers = activeTab === "users"
+    const headers = isUserOrCustomerTab()
       ? ["Username", "System Role", "E-mail", "User Department", "User Designation"]
       : ["Username", "Status", "E-mail", "Registered"];
     const escapeXml = (unsafe) => String(unsafe ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
     const headerHtml = `<tr>${headers.map(h => `<th>${escapeXml(h)}</th>`).join("")}</tr>`;
-    const rowsHtml = targetRows.map(r => activeTab === "users" ? `
+    const rowsHtml = targetRows.map(r => isUserOrCustomerTab() ? `
       <tr>
         <td>${escapeXml(r.username)}</td>
         <td>${escapeXml(r.role)}</td>
@@ -454,12 +471,12 @@ function UseradminPage() {
 
   const exportCsv = () => {
     const targetRows = getTargetRows();
-    const headers = activeTab === "users"
+    const headers = isUserOrCustomerTab()
       ? ["Username", "System Role", "E-mail", "User Department", "User Designation"]
       : ["Username", "Status", "E-mail", "Registered"];
     const csvContent = [
       headers.join(","),
-      ...targetRows.map(r => activeTab === "users" ? [
+      ...targetRows.map(r => isUserOrCustomerTab() ? [
         `"${(r.username || '').replace(/"/g, '""')}"`,
         `"${(r.role || '').replace(/"/g, '""')}"`,
         `"${(r.email || '').replace(/"/g, '""')}"`,
@@ -484,13 +501,13 @@ function UseradminPage() {
     const targetRows = getTargetRows();
     const doc = new jsPDF({ orientation: "portrait", unit: "pt", format: "a4" });
     doc.setFontSize(14);
-    doc.text(activeTab === "users" ? "Users Report" : "Pending Users Report", 40, 40);
+    doc.text(isUserOrCustomerTab() ? "Users Report" : "Pending Users Report", 40, 40);
     doc.setFontSize(10);
     doc.text(`Generated: ${new Date().toLocaleString()}`, 40, 58);
-    const headers = activeTab === "users"
+    const headers = isUserOrCustomerTab()
       ? [["Username", "System Role", "E-mail", "User Department", "User Designation"]]
       : [["Username", "Status", "E-mail", "Registered"]];
-    const body = targetRows.map(r => activeTab === "users" ? [
+    const body = targetRows.map(r => isUserOrCustomerTab() ? [
       r.username || '',
       r.role || '',
       r.email || '',
@@ -856,7 +873,7 @@ function UseradminPage() {
         {/* Category Tabs Interface */}
         <div className="border-bottom bg-light px-3 pt-2">
           <ul className="nav nav-tabs border-0" role="tablist">
-            {["users", "pending", "sessions", "logs"].map((tab) => (
+            {["users", "customers", "pending", "sessions", "logs"].map((tab) => (
               <li className="nav-item" key={tab}>
                 <button
                   className={`nav-link border-0 text-capitalize ${activeTab === tab ? "active bg-white fw-bold text-primary" : "text-muted"}`}
@@ -867,7 +884,7 @@ function UseradminPage() {
                     setSelectedIds(new Set());
                   }}
                 >
-                  {tab === "users" ? "User Table" : tab === "pending" ? "Awaiting Activation" : tab}
+                  {tab === "users" ? "User Table" : tab === "customers" ? "Customer Users" : tab === "pending" ? "Awaiting Activation" : tab}
                 </button>
               </li>
             ))}
@@ -908,7 +925,7 @@ function UseradminPage() {
               )}
             </button>
 
-            {(activeTab === "users" || activeTab === "pending") && (
+            {(activeTab === "users" || activeTab === "customers" || activeTab === "pending") && (
               <div className="dropdown">
                 <button
                   className="btn btn-white border d-flex align-items-center gap-2 dropdown-toggle"
@@ -932,7 +949,7 @@ function UseradminPage() {
 
         {/* Tab Content Panes Container */}
         <div className="tab-content">
-          {activeTab === "users" && (
+          {(activeTab === "users" || activeTab === "customers") && (
             <div className="tab-pane fade show active">
               <div className="table-responsive">
                 <table className="table table-hover align-middle mb-0">
@@ -942,7 +959,7 @@ function UseradminPage() {
                         <input
                           type="checkbox"
                           className="form-check-input"
-                          checked={filteredRows.length > 0 && filteredRows.every(r => selectedIds.has(r.id))}
+                          checked={getActiveTabRows().length > 0 && getActiveTabRows().every(r => selectedIds.has(r.id))}
                           onChange={(e) => handleSelectAll(e.target.checked)}
                         />
                       </th>
@@ -957,10 +974,10 @@ function UseradminPage() {
                   <tbody>
                     {loading ? (
                       <tr><td colSpan={7} className="text-center py-4">Loading user metrics...</td></tr>
-                    ) : filteredRows.length === 0 ? (
+                    ) : getActiveTabRows().length === 0 ? (
                       <tr><td colSpan={7} className="text-center py-4 text-muted">No users found matching selections</td></tr>
                     ) : (
-                      filteredRows.map((row) => (
+                      getActiveTabRows().map((row) => (
                         <tr key={row.id}>
                           <td className="ps-4">
                             <input
@@ -1017,7 +1034,7 @@ function UseradminPage() {
               </div>
 
               {/* Custom Pagination Footer */}
-              {!loading && filteredRows.length > 0 && (
+              {!loading && getActiveTabRows().length > 0 && (
                 <div className="p-3 border-top d-flex flex-wrap align-items-center justify-content-between gap-3 bg-light">
                   <div className="text-muted small">
                     Showing {totalElements > 0 ? page * size + 1 : 0} to {Math.min((page + 1) * size, totalElements)} of {totalElements} entries
@@ -1315,7 +1332,7 @@ function UseradminPage() {
       </div>
 
       {/* Floating Dark Bottom Actions Bar */}
-      {selectedIds.size > 0 && (activeTab === "users" || activeTab === "pending") && createPortal(
+      {selectedIds.size > 0 && (activeTab === "users" || activeTab === "customers" || activeTab === "pending") && createPortal(
         <div className="floating-bulk-bar" style={{
           position: "fixed",
           bottom: 24,
@@ -1334,7 +1351,7 @@ function UseradminPage() {
           <span className="small">{selectedIds.size} user(s) selected</span>
           <button className="btn btn-sm btn-outline-light" onClick={() => setSelectedIds(new Set())}>Clear</button>
           
-          {activeTab === "users" && (
+          {(activeTab === "users" || activeTab === "customers") && (
             <>
               <button className="btn btn-sm btn-success" onClick={() => handleBulkToggleActive(true)} disabled={saving}>Bulk Activate</button>
               <button className="btn btn-sm btn-warning" onClick={() => handleBulkToggleActive(false)} disabled={saving}>Bulk Deactivate</button>

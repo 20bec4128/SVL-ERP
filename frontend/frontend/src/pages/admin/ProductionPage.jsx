@@ -322,15 +322,11 @@ export default function ProductionPage() {
                       <td className="fw-semibold" style={{ color: "#0f172a", fontSize: "0.9rem" }}>{deal.requirementType || "-"}</td>
                       <td style={{ color: "#475569", fontSize: "0.9rem" }}>{deal.requirementNotes || "-"}</td>
                       <td>
-                        <span className={`badge ${
-                          deal.productionWorkStatus === "Completed"
-                            ? "bg-success"
-                            : deal.productionWorkStatus === "Started"
-                            ? "bg-info"
-                            : "bg-secondary"
-                        }`} style={{ fontSize: "0.8rem", padding: "6px 12px", borderRadius: 8 }}>
-                          {deal.productionWorkStatus || "Not Started"}
-                        </span>
+                        {(() => {
+                          const s = deal.productionWorkStatus || "Not Started";
+                          const badgeMap = { "Not Started": "secondary", "In Progress": "warning", "Quality Check": "info", "Ready for Delivery": "success", "Started": "info", "Completed": "success" };
+                          return <span className={`badge bg-${badgeMap[s] || "secondary"}`} style={{ fontSize: "0.8rem", padding: "6px 12px", borderRadius: 8 }}>{s}</span>;
+                        })()}
                       </td>
                       <td>
                         {deal.designFinalFileName ? (

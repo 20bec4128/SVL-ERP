@@ -14,6 +14,7 @@ import com.nexorcrm.backend.repo.LeadRepository;
 import com.nexorcrm.backend.repo.QuotationRepository;
 import com.nexorcrm.backend.repo.SalesOrderRepository;
 import com.nexorcrm.backend.repo.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,6 +34,7 @@ public class CustomerService {
     private final InvoiceRepository invoiceRepository;
     private final QuotationRepository quotationRepository;
     private final SalesOrderRepository salesOrderRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public CustomerService(
             CustomerRepository customerRepository,
@@ -40,13 +42,15 @@ public class CustomerService {
             UserRepository userRepository,
             InvoiceRepository invoiceRepository,
             QuotationRepository quotationRepository,
-            SalesOrderRepository salesOrderRepository) {
+            SalesOrderRepository salesOrderRepository,
+            PasswordEncoder passwordEncoder) {
         this.customerRepository = customerRepository;
         this.leadRepository = leadRepository;
         this.userRepository = userRepository;
         this.invoiceRepository = invoiceRepository;
         this.quotationRepository = quotationRepository;
         this.salesOrderRepository = salesOrderRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public Customer convertLeadToCustomer(Long leadId) {
@@ -125,7 +129,7 @@ public class CustomerService {
         invoice.setStatus("Draft");
         invoiceRepository.save(invoice);
 
-        // Auto-provision Customer Portal Account (Inactive with activation token)
+        // Auto-provision or activate Customer Portal Account
         if (savedCustomer.getEmailAddress() != null && !savedCustomer.getEmailAddress().isBlank()) {
             Optional<User> existingUser = userRepository.findByEmailIgnoreCaseAndIsDeletedFalse(savedCustomer.getEmailAddress());
             if (!existingUser.isPresent()) {
@@ -134,11 +138,17 @@ public class CustomerService {
                 user.setEmail(savedCustomer.getEmailAddress());
                 user.setFirstName(savedCustomer.getContactPerson());
                 user.setRole(Role.CUSTOMER);
-                user.setActivationStatus(ActivationStatus.PENDING);
-                user.setActive(false);
-                user.setPasswordHash(UUID.randomUUID().toString()); // Placeholder password until activated
-                user.setActivationToken(UUID.randomUUID().toString());
+                user.setActivationStatus(ActivationStatus.ACTIVE);
+                user.setActive(true);
+                user.setPasswordHash(passwordEncoder.encode("Customer@123"));
                 userRepository.save(user);
+            } else {
+                User user = existingUser.get();
+                if (user.getRole() == Role.CUSTOMER) {
+                    user.setActive(true);
+                    user.setActivationStatus(ActivationStatus.ACTIVE);
+                    userRepository.save(user);
+                }
             }
         }
 
@@ -151,5 +161,9 @@ public class CustomerService {
 
     public Optional<Customer> getCustomerById(Long id) {
         return customerRepository.findById(id);
+    }
+
+    public void deleteCustomer(Long id) {
+        customerRepository.deleteById(id);
     }
 }

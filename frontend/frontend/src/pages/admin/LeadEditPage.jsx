@@ -27,6 +27,7 @@ import { getProjectStatuses } from "../../api/projectStatusApi";
 import { getProjectTypes } from "../../api/projectTypeApi";
 import { Country, State, City } from "country-state-city";
 import { extractApiErrorMessage } from "../../utils/errorMessage";
+import { resolveMediaUrl } from "../../utils/mediaUrl";
 import { COUNTRY_CODE_OPTIONS, defaultCountryOption, ensureCountryCodeValue, getCountryAllowedLengths, getCountryDisplayMaxLength, getCountryOptionByValue, sanitizePhoneDigits, validatePhoneNumber } from "../../utils/phoneUtils";
 import { pickFlowAssignee, pickGroupAssignee } from "../../utils/flowAssignment";
 import { validateStatusTransition } from "../../utils/statusValidation";
@@ -3713,9 +3714,9 @@ export default function LeadEditPage({ leadIdOverride } = {}) {
                               {log.details}
                             </p>
                           )}
-                          {log.fileUrl && (
+                          {log.filePath && (
                             <a
-                              href={log.fileUrl}
+                              href={resolveMediaUrl(log.filePath)}
                               target="_blank"
                               rel="noopener noreferrer"
                               className="small"

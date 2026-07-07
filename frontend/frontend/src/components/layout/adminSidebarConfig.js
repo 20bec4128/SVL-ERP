@@ -136,6 +136,12 @@ export const adminSidebarSections = [
         accessAny: ["production"],
       },
       {
+        label: "Delivery",
+        href: "/delivery",
+        icon: "ti ti-truck",
+        accessAny: ["delivery"],
+      },
+      {
         label: "Services",
         icon: "ti ti-tool",
         accessAny: ["services", "service-categories", "service-types", "price-list", "product-field-config"],

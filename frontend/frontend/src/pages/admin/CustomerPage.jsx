@@ -127,7 +127,7 @@ export default function CustomerPage() {
     if (!pendingDelete?.id) return;
     setSaving(true);
     try {
-      await deleteUser(pendingDelete.id);
+      await api.delete(`/api/v1/customers/${pendingDelete.id}`);
       showSuccess("Customer deleted successfully");
       setPendingDelete(null);
       await load();
@@ -186,18 +186,17 @@ export default function CustomerPage() {
                   <th className="text-muted" style={{ fontWeight: "600", fontSize: "0.85rem" }}>Email & Phone</th>
                   <th className="text-muted" style={{ fontWeight: "600", fontSize: "0.85rem" }}>GST & Type</th>
                   <th className="text-muted" style={{ fontWeight: "600", fontSize: "0.85rem" }}>Billing Address</th>
-                  <th className="text-muted" style={{ fontWeight: "600", fontSize: "0.85rem" }}>Payment Terms</th>
                   <th className="text-muted" style={{ width: 120, fontWeight: "600", fontSize: "0.85rem" }}>Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {loading ? (
                   <tr>
-                    <td colSpan={8} className="text-center py-4 text-muted">Loading...</td>
+                    <td colSpan={7} className="text-center py-4 text-muted">Loading...</td>
                   </tr>
                 ) : pagedRows.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="text-center py-4 text-muted">No records found</td>
+                    <td colSpan={7} className="text-center py-4 text-muted">No records found</td>
                   </tr>
                 ) : (
                   pagedRows.map((r, i) => (
@@ -221,17 +220,23 @@ export default function CustomerPage() {
                       <td style={{ color: "#475569", fontSize: "0.85rem", maxWidth: 200, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {r.billingAddress || "-"}
                       </td>
-                      <td style={{ color: "#475569", fontSize: "0.85rem" }}>
-                        {r.paymentTerms || "-"}
-                      </td>
                       <td>
-                        <button
-                          className="btn btn-sm btn-outline-primary"
-                          style={{ borderRadius: 8, fontWeight: "600" }}
-                          onClick={() => navigate("/quotation", { state: { prefillCustomer: r } })}
-                        >
-                          Create Quotation
-                        </button>
+                        <div className="d-flex align-items-center gap-2">
+                          <button
+                            className="btn btn-sm btn-outline-primary"
+                            style={{ borderRadius: 8, fontWeight: "600" }}
+                            onClick={() => navigate("/quotation", { state: { prefillCustomer: r } })}
+                          >
+                            Create Quotation
+                          </button>
+                          <button
+                            className="btn btn-sm btn-outline-danger"
+                            style={{ borderRadius: 8 }}
+                            onClick={() => setPendingDelete(r)}
+                          >
+                            <i className="ti ti-trash" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))
@@ -372,7 +377,7 @@ export default function CustomerPage() {
                 <div className="modal-body p-4 text-center">
                   <i className="ti ti-alert-triangle text-danger mb-3" style={{ fontSize: "2rem" }}></i>
                   <p className="mb-0">
-                    Are you sure you want to delete customer <strong>{pendingDelete.firstName || pendingDelete.username}</strong>?
+                    Are you sure you want to delete customer <strong>{pendingDelete.companyName || pendingDelete.contactPerson}</strong>?
                   </p>
                 </div>
                 <div className="modal-footer border-0 p-3 bg-light d-flex justify-content-center">

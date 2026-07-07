@@ -109,6 +109,9 @@ export function PageAccessProvider({ children }) {
   const canAccess = useMemo(() => {
     return (pageKey) => {
       if (!user) return false;
+      if (role === "SUPER_ADMIN" || role === "ADMIN") {
+        if (pageKey === "delivery") return true;
+      }
       return hasEquivalentPageKey(visiblePageKeys, pageKey);
     };
   }, [user, role, visiblePageKeys]);

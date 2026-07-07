@@ -202,6 +202,7 @@ export default function DesignPage() {
                     <th className="text-muted" style={{ fontWeight: "600", fontSize: "0.85rem" }}>Requirement Type</th>
                     <th className="text-muted" style={{ fontWeight: "600", fontSize: "0.85rem" }}>Requirement Notes</th>
                     <th className="text-muted" style={{ fontWeight: "600", fontSize: "0.85rem" }}>Assigned to</th>
+                    <th className="text-muted" style={{ fontWeight: "600", fontSize: "0.85rem" }}>Status</th>
                     <th className="text-muted text-end" style={{ width: 320, fontWeight: "600", fontSize: "0.85rem" }}>Action</th>
                   </tr>
                 </thead>
@@ -212,6 +213,14 @@ export default function DesignPage() {
                       <td className="fw-semibold" style={{ color: "#0f172a", fontSize: "0.9rem" }}>{deal.requirementType || "-"}</td>
                       <td style={{ color: "#475569", fontSize: "0.9rem" }}>{deal.requirementNotes || "-"}</td>
                       <td style={{ color: "#475569", fontSize: "0.9rem" }}>{deal.designAssignedToName || "-"}</td>
+                      <td>
+                        {(() => {
+                          const s = deal.designRequestStatus || "PENDING";
+                          const badgeMap = { PENDING: "secondary", WORK_STARTED: "warning", DRAFT_READY: "info", FEEDBACK_SENT: "primary", FINAL_APPROVED: "success", FINAL_UPLOADED: "success" };
+                          const labelMap = { PENDING: "Pending", WORK_STARTED: "In Progress", DRAFT_READY: "Draft Ready", FEEDBACK_SENT: "Feedback", FINAL_APPROVED: "Approved", FINAL_UPLOADED: "Completed" };
+                          return <span className={`badge bg-${badgeMap[s] || "secondary"}`}>{labelMap[s] || s}</span>;
+                        })()}
+                      </td>
                       <td className="text-end">
                         <div className="d-flex justify-content-end gap-2">
                           <button

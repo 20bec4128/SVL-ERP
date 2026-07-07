@@ -60,6 +60,7 @@ public class DealService {
     private final LeadFlowService leadFlowService;
     private final UserGroupRepository userGroupRepository;
     private final UserGroupMemberRepository userGroupMemberRepository;
+    private final EmailNotificationService emailNotificationService;
 
     public DealService(DealRepository dealRepository,
                        LeadLogRepository leadLogRepository,
@@ -68,7 +69,8 @@ public class DealService {
                        DealFlowService dealFlowService,
                        LeadFlowService leadFlowService,
                        UserGroupRepository userGroupRepository,
-                       UserGroupMemberRepository userGroupMemberRepository) {
+                       UserGroupMemberRepository userGroupMemberRepository,
+                       EmailNotificationService emailNotificationService) {
         this.dealRepository = dealRepository;
         this.leadLogRepository = leadLogRepository;
         this.leadRepository = leadRepository;
@@ -77,6 +79,7 @@ public class DealService {
         this.leadFlowService = leadFlowService;
         this.userGroupRepository = userGroupRepository;
         this.userGroupMemberRepository = userGroupMemberRepository;
+        this.emailNotificationService = emailNotificationService;
     }
 
     /**
@@ -840,8 +843,57 @@ public class DealService {
                 .orElseThrow(() -> new EntityNotFoundException("Deal not found"));
         assertCanEditDeal(actor, deal);
         deal.setProductionWorkStatus(workStatus);
-        dealRepository.save(deal);
+        // Auto-transition to Delivery when production is ready
+        if ("Ready for Delivery".equalsIgnoreCase(workStatus)) {
+            deal.setStatus("Delivery");
+            dealRepository.save(deal);
+            sendDeliveryEmailToCustomer(deal);
+        } else {
+            dealRepository.save(deal);
+        }
         return toResponse(deal);
+    }
+
+    @Transactional(readOnly = true)
+    public List<DealResponse> listDeliveryRequests(String actorPrincipal) {
+        User actor = assertAccess(actorPrincipal);
+        return dealRepository.findByDeletedFalseOrderByConvertedAtDesc().stream()
+                .filter(d -> "Delivery".equalsIgnoreCase(d.getStatus()) || "Delivered".equalsIgnoreCase(d.getStatus()))
+                .filter(d -> actor.getRole() == Role.SUPER_ADMIN || actor.getRole() == Role.ADMIN
+                        || actor.getRole() == Role.MANAGER)
+                .map(this::toResponse)
+                .toList();
+    }
+
+    public DealResponse markDelivered(Long id, String actorPrincipal) {
+        User actor = assertAccess(actorPrincipal);
+        if (actor.getRole() != Role.SUPER_ADMIN && actor.getRole() != Role.ADMIN && actor.getRole() != Role.MANAGER) {
+            throw new AccessDeniedException("Only admins or managers can mark a deal as delivered");
+        }
+        Deal deal = dealRepository.findByIdAndDeletedFalse(id)
+                .orElseThrow(() -> new EntityNotFoundException("Deal not found"));
+        deal.setStatus("Delivered");
+        dealRepository.save(deal);
+        createSourceLeadLog(deal, "Order marked as delivered", actor);
+        return toResponse(deal);
+    }
+
+    private void sendDeliveryEmailToCustomer(Deal deal) {
+        try {
+            if (deal == null || !StringUtils.hasText(deal.getEmail())) return;
+            String customerName = StringUtils.hasText(deal.getName()) ? deal.getName() : "Valued Customer";
+            String projectName = StringUtils.hasText(deal.getProjectName()) ? deal.getProjectName() :
+                    StringUtils.hasText(deal.getName()) ? deal.getName() : "your order";
+            String subject = "Your order is ready for delivery – " + projectName;
+            String body = "Dear " + customerName + ",\n\n" +
+                    "We are pleased to inform you that your order (" + projectName + ") has been completed and is now ready for delivery.\n\n" +
+                    "Our team will be in touch with you shortly to arrange the delivery details.\n\n" +
+                    "Thank you for choosing us!\n\n" +
+                    "Best regards,\nSVL Team";
+            emailNotificationService.notifyNowIfEnabled(deal.getEmail(), subject, body);
+        } catch (Exception e) {
+            logger.warn("Failed to send delivery email for deal {}: {}", deal.getId(), e.getMessage());
+        }
     }
 
     private DealResponse toResponse(Deal deal) {
@@ -1038,28 +1090,31 @@ public class DealService {
             createSourceLeadLog(deal, "Final design uploaded", actor, null, null);
         }
 
-        // Auto-transition: if requirement type is "Design + Production" and deal is
-        // currently in "Design" or "Design + Production" status, automatically move to "Production" after final upload.
+        // Auto-transition logic after final upload
         String requirementTypeToCheck = deal.getRequirementType();
         if (requirementTypeToCheck == null && deal.getSourceLeadId() != null) {
-            // Fall back to source lead's requirement type (for deals created before the fix)
             Lead sourceLead = leadRepository.findByIdAndDeletedFalse(deal.getSourceLeadId()).orElse(null);
             if (sourceLead != null) {
                 requirementTypeToCheck = sourceLead.getRequirementType();
-                // Also save it to the deal for future reference
                 deal.setRequirementType(requirementTypeToCheck);
             }
         }
-        
+
         if ("Design + Production".equalsIgnoreCase(requirementTypeToCheck)
                 && ("design".equalsIgnoreCase(deal.getStatus()) || "design + production".equalsIgnoreCase(deal.getStatus()))) {
+            // Design+Production: move to Production stage for the production team
             deal.setStatus("Production");
             dealRepository.save(deal);
-            // Assign production employee via round-robin
             if (deal.getSourceLeadId() != null) {
                 assignProductionRequest(deal.getSourceLeadId());
             }
             logger.info("Auto-transitioned deal {} from Design to Production (Design + Production requirement)", id);
+        } else if ("design".equalsIgnoreCase(deal.getStatus()) || "Design + Production".equalsIgnoreCase(requirementTypeToCheck) == false) {
+            // Design-only: move straight to Delivery and email customer
+            deal.setStatus("Delivery");
+            dealRepository.save(deal);
+            sendDeliveryEmailToCustomer(deal);
+            logger.info("Auto-transitioned deal {} from Design to Delivery", id);
         }
 
         return toResponse(deal);
@@ -1103,7 +1158,7 @@ public class DealService {
                     .toList();
         }
 
-        if (actor.getRole() == Role.MANAGER) {
+        if (actor.getRole() == Role.MANAGER || actor.getRole() == Role.TEAM_LEAD) {
             assertTeamScope(actor);
             return userGroupRepository
                     .findByInstitutionNameIgnoreCaseAndDepartmentNameIgnoreCaseOrderByNameAsc(
@@ -1171,48 +1226,44 @@ public class DealService {
         if (actor.getRole() == Role.SUPER_ADMIN || actor.getRole() == Role.ADMIN) {
             return true;
         }
-        
-        // For MANAGER: can see if assigned employee is in their visible groups
-        if (actor.getRole() == Role.MANAGER) {
-            if (deal.getDesignAssignedToUserId() != null && !visibleGroupIds.isEmpty()) {
-                // Check if the assigned employee is a member of any of the manager's visible groups
-                long assignedUserId = deal.getDesignAssignedToUserId();
-                List<UserGroupMember> memberships = userGroupMemberRepository.findByUser_IdOrderByIdAsc(assignedUserId);
-                return memberships.stream()
-                        .anyMatch(m -> m.getGroup() != null && visibleGroupIds.contains(m.getGroup().getId()));
-            }
-            return false;
+
+        // Allow any user whose visible groups include design page visibility
+        List<UserGroup> visibleGroups = findDealVisibleGroupsForActor(actor);
+        boolean hasDesignAccess = visibleGroups.stream()
+                .anyMatch(group -> parseCsv(group.getPageKeysCsv()).stream()
+                        .anyMatch(key -> "design".equalsIgnoreCase(key)));
+        if (hasDesignAccess) {
+            return true;
         }
-        
-        // For EMPLOYEE: can only see if assigned to them
-        if (actor.getRole() != Role.EMPLOYEE) {
-            return false;
+
+        // EMPLOYEE: also see if directly assigned to them
+        if (actor.getRole() == Role.EMPLOYEE) {
+            return Objects.equals(deal.getDesignAssignedToUserId(), actor.getId());
         }
-        return Objects.equals(deal.getDesignAssignedToUserId(), actor.getId());
+
+        return false;
     }
 
     private boolean canViewProductionRequest(User actor, Deal deal, Set<Long> visibleGroupIds) {
         if (actor.getRole() == Role.SUPER_ADMIN || actor.getRole() == Role.ADMIN) {
             return true;
         }
-        
-        // For MANAGER: can see if assigned employee is in their visible groups
-        if (actor.getRole() == Role.MANAGER) {
-            if (deal.getProductionAssignedToUserId() != null && !visibleGroupIds.isEmpty()) {
-                // Check if the assigned employee is a member of any of the manager's visible groups
-                long assignedUserId = deal.getProductionAssignedToUserId();
-                List<UserGroupMember> memberships = userGroupMemberRepository.findByUser_IdOrderByIdAsc(assignedUserId);
-                return memberships.stream()
-                        .anyMatch(m -> m.getGroup() != null && visibleGroupIds.contains(m.getGroup().getId()));
-            }
-            return false;
+
+        // Allow any user whose visible groups include production page visibility
+        List<UserGroup> visibleGroups = findDealVisibleGroupsForActor(actor);
+        boolean hasProductionAccess = visibleGroups.stream()
+                .anyMatch(group -> parseCsv(group.getPageKeysCsv()).stream()
+                        .anyMatch(key -> "production".equalsIgnoreCase(key)));
+        if (hasProductionAccess) {
+            return true;
         }
-        
-        // For EMPLOYEE: can only see if assigned to them
-        if (actor.getRole() != Role.EMPLOYEE) {
-            return false;
+
+        // EMPLOYEE: also see if directly assigned to them
+        if (actor.getRole() == Role.EMPLOYEE) {
+            return Objects.equals(deal.getProductionAssignedToUserId(), actor.getId());
         }
-        return Objects.equals(deal.getProductionAssignedToUserId(), actor.getId());
+
+        return false;
     }
 
     private boolean canEditDeal(User actor, Deal deal) {

@@ -300,6 +300,10 @@ export const adminPhpRoutes = [
     component: "ProductionWorkPage",
   },
   {
+    path: "delivery",
+    component: "DeliveryPage",
+  },
+  {
     path: "departments",
     component: "DepartmentsPage",
   },

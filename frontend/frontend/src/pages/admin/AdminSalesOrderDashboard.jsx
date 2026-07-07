@@ -3,6 +3,7 @@ import { getSalesOrders, getPaymentsForOrder, verifyPayment, getJobForOrder, get
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import { Link } from "react-router-dom";
 import { useToast } from "../../components/system/ToastProvider";
+import { resolveMediaUrl } from "../../utils/mediaUrl";
 
 export default function AdminSalesOrderDashboard() {
   const { showSuccess, showError } = useToast();
@@ -286,7 +287,7 @@ export default function AdminSalesOrderDashboard() {
                               <td>
                                 {p.proofFilePath ? (
                                   <a
-                                    href={p.proofFilePath}
+                                    href={resolveMediaUrl(p.proofFilePath)}
                                     target="_blank"
                                     rel="noreferrer"
                                     className="btn btn-sm btn-outline-info d-inline-flex align-items-center gap-1"

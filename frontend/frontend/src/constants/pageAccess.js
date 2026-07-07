@@ -25,6 +25,7 @@ export const PAGE_ACCESS_OPTIONS = [
   { key: "customer", label: "Customers", category: "CRM & Sales" },
   { key: "design", label: "Design", category: "Operations" },
   { key: "production", label: "Production", category: "Operations" },
+  { key: "delivery", label: "Delivery", category: "Operations" },
   {
     key: "services",
     label: "Services",
@@ -247,6 +248,7 @@ const ROUTE_ACCESS_RULES = [
   { pageKeys: ["contacts"], prefixes: ["/contacts", "/contacts-grid"] },
   { pageKeys: ["production"], prefixes: ["/production", "/production-detail"] },
   { pageKeys: ["design"], prefixes: ["/design", "/design-detail", "/design-work"] },
+  { pageKeys: ["delivery"], prefixes: ["/delivery"] },
 
   { pageKeys: ["customer"], prefixes: ["/customer"] },
   { pageKeys: ["leads"], prefixes: ["/leads", "/leads-dashboard"] },

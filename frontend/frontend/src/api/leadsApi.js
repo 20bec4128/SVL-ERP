@@ -493,6 +493,17 @@ export async function recordPayment(paymentData) {
   return response?.data || {}
 }
 
+export async function createRazorpayOrder(orderData) {
+  const response = await api.post('/api/payments/create-order', orderData)
+  return response?.data || {}
+}
+
+export async function verifyRazorpayPayment(verificationData) {
+  const response = await api.post('/api/payments/verify', verificationData)
+  return response?.data || {}
+}
+
+
 export async function getPaymentsForOrder(orderId) {
   const response = await api.get(`/api/v1/erp/payments/sales-order/${orderId}`)
   return Array.isArray(response?.data) ? response.data : []

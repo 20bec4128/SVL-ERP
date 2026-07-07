@@ -155,6 +155,22 @@ public class DealController {
         return dealService.listProductionRequests(authentication.getName());
     }
 
+    @GetMapping("/delivery-requests")
+    public List<DealResponse> listDeliveryRequests(Authentication authentication) {
+        return dealService.listDeliveryRequests(authentication.getName());
+    }
+
+    @PatchMapping("/{id}/mark-delivered")
+    public DealResponse markDelivered(@PathVariable Long id, Authentication authentication) {
+        try {
+            return dealService.markDelivered(id, authentication.getName());
+        } catch (EntityNotFoundException e) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, e.getMessage());
+        } catch (AccessDeniedException e) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, e.getMessage());
+        }
+    }
+
     @PatchMapping("/{id}/production-work-status")
     public DealResponse updateProductionWorkStatus(@PathVariable Long id, @RequestBody Map<String, Object> payload, Authentication authentication) {
         try {

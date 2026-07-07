@@ -16,7 +16,7 @@ export default function BottomNav() {
   const [attendanceLoading, setAttendanceLoading] = useState(false);
   const profileMenuRef = useRef(null);
 
-  const isCustomer = location.pathname.startsWith("/customer");
+  const isCustomer = location.pathname.startsWith("/portal") || location.pathname.startsWith("/customer") || user?.role === "CUSTOMER";
   const isVendor = location.pathname.startsWith("/vendor") || !!vendorSession?.vendorId;
   const isAdmin = !isCustomer && !isVendor && isAuthenticated;
 

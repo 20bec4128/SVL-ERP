@@ -67,6 +67,7 @@ public class UserGroupService {
             "leads",
             "design",
             "production",
+            "delivery",
             "contacts",
             "companies",
             "pipeline",

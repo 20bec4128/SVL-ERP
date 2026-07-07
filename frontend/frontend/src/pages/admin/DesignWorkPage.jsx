@@ -5,7 +5,6 @@ import { getDealById } from "../../api/dealsApi";
 import {
   startDesignWork as apiStartDesignWork,
   uploadDesignDraft as apiUploadDesignDraft,
-  approveFinalDesign as apiApproveFinalDesign,
   uploadFinalDesign as apiUploadFinalDesign,
 } from "../../api/dealsApi";
 import { downloadLeadChatAttachment, getLeadChatMessages } from "../../api/leadsApi";
@@ -36,16 +35,14 @@ async function downloadFile(filePath, fileName) {
   window.URL.revokeObjectURL(blobUrl);
 }
 
-const STATUS_ORDER = ["PENDING", "WORK_STARTED", "DRAFT_READY", "FEEDBACK_SENT", "FINAL_APPROVED", "FINAL_UPLOADED"];
+const STATUS_ORDER = ["PENDING", "WORK_STARTED", "DRAFT_READY", "FINAL_UPLOADED"];
 
 function statusLabel(s) {
   switch (s) {
     case "PENDING": return "Pending";
-    case "WORK_STARTED": return "Work Started";
+    case "WORK_STARTED": return "Work In Progress";
     case "DRAFT_READY": return "Draft Ready";
-    case "FEEDBACK_SENT": return "Feedback Sent";
-    case "FINAL_APPROVED": return "Approved";
-    case "FINAL_UPLOADED": return "Final Uploaded";
+    case "FINAL_UPLOADED": return "Completed";
     default: return s || "Pending";
   }
 }
@@ -55,8 +52,6 @@ function statusBadgeColor(s) {
     case "PENDING": return "secondary";
     case "WORK_STARTED": return "warning";
     case "DRAFT_READY": return "info";
-    case "FEEDBACK_SENT": return "primary";
-    case "FINAL_APPROVED": return "success";
     case "FINAL_UPLOADED": return "success";
     default: return "secondary";
   }
@@ -268,22 +263,9 @@ export default function DesignWorkPage() {
       setFinalFile(null);
       const inp = document.getElementById("final-file-input");
       if (inp) inp.value = "";
-      showSuccess("Final print-ready file uploaded!");
+      showSuccess("Final file uploaded! Order is now moving to Delivery.");
     } catch (err) {
       showError("Failed to upload final file");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleApprove = async () => {
-    setSaving(true);
-    try {
-      const updated = await apiApproveFinalDesign(id);
-      setDeal(updated);
-      showSuccess("Design approved! Designer can now upload the final file.");
-    } catch (err) {
-      showError("Failed to approve design");
     } finally {
       setSaving(false);
     }
@@ -314,7 +296,6 @@ export default function DesignWorkPage() {
   const draftVersion = (deal.designDraftCount || 0) + 1;
   const hasDraft = !!deal.designDraftFileName;
   const hasFeedback = !!deal.designSalesFeedback;
-  const isApproved = designStatus === "FINAL_APPROVED" || designStatus === "FINAL_UPLOADED";
   const isFinalUploaded = designStatus === "FINAL_UPLOADED";
   const hasFinalFile = !!deal.designFinalFileName;
 
@@ -423,7 +404,7 @@ export default function DesignWorkPage() {
         )}
 
         {/* STEP 2: Upload Draft */}
-        {(designStatus === "WORK_STARTED" || designStatus === "DRAFT_READY" || designStatus === "FEEDBACK_SENT") && !isApproved && (
+        {(designStatus === "WORK_STARTED" || designStatus === "DRAFT_READY" || designStatus === "FEEDBACK_SENT") && !isFinalUploaded && (
           <div className="card mb-4">
             <div className="card-header d-flex justify-content-between align-items-center">
               <h5 className="card-title mb-0">
@@ -478,38 +459,6 @@ export default function DesignWorkPage() {
                   </button>
                 </div>
               </div>
-
-              {draftLogRows.length > 0 && (
-                <div className="mt-4 pt-4 border-top">
-                  <div className="d-flex align-items-center justify-content-between flex-wrap gap-2 mb-3">
-                    <h6 className="mb-0 fw-semibold">Draft Upload Log</h6>
-                    <small className="text-muted">{draftLogRows.length} file{draftLogRows.length === 1 ? "" : "s"}</small>
-                  </div>
-                  <div className="list-group">
-                    {draftLogRows.map((row, index) => (
-                      <div
-                        key={row.id || `${row.createdAt || "draft"}-${index}`}
-                        className="list-group-item d-flex align-items-center justify-content-between flex-wrap gap-3"
-                      >
-                        <div>
-                          <div className="fw-semibold">
-                            {getDesignThreadText(row.message) || `Draft V${draftLogRows.length - index}`}
-                          </div>
-                          <div className="text-muted small text-break">{row.attachmentName}</div>
-                          <div className="text-muted small">Uploaded {formatDateTime(row.createdAt)}</div>
-                        </div>
-                        <button
-                          type="button"
-                          className="btn btn-sm btn-outline-info"
-                          onClick={() => handleDownloadDraftLogFile(row)}
-                        >
-                          <i className="ti ti-download me-1"></i>Download
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           </div>
         )}
@@ -533,18 +482,17 @@ export default function DesignWorkPage() {
           </div>
         )}
 
-      
-        {/* STEP 4: Upload Final File */}
-        {designStatus === "FINAL_APPROVED" && !isFinalUploaded && (
+        {/* STEP 4: Upload Final File — No approval required */}
+        {(designStatus === "DRAFT_READY" || designStatus === "WORK_STARTED" || designStatus === "FEEDBACK_SENT") && !isFinalUploaded && hasDraft && (
           <div className="card mb-4 border-success">
             <div className="card-header bg-success text-white">
               <h5 className="card-title mb-0">
-                <i className="ti ti-circle-check me-2"></i>Design Approved � Upload Final Print-Ready File
+                <i className="ti ti-circle-check me-2"></i>Upload Final Print-Ready File
               </h5>
             </div>
             <div className="card-body">
               <div className="alert alert-success mb-4">
-                <i className="ti ti-check me-2"></i>Sales has approved the design. Upload the final print-ready file below.
+                <i className="ti ti-info-circle me-2"></i>Draft is ready. Upload the final print-ready file to complete this request and move it to Delivery.
               </div>
               <div className="row g-3 align-items-end">
                 <div className="col-md-8">

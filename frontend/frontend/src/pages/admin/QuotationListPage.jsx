@@ -514,7 +514,7 @@ export default function QuotationListPage() {
       const { updateLeadRowStatus } = await import("../../api/leadsApi");
       await updateLeadRowStatus(q.leadId, "deal");
 
-      const { getDealByLeadId, updateDealStatus } = await import("../../api/dealsApi");
+      const { getDealByLeadId, updateDeal, updateDealStatus } = await import("../../api/dealsApi");
       let deal = null;
       for (let i = 0; i < 5; i++) {
         try {
@@ -526,6 +526,18 @@ export default function QuotationListPage() {
       }
 
       if (deal) {
+        // Compile allocation details to show in Design/Production tables
+        const allocatedItemsList = q.items?.filter((item) => !isAdditionalChargeItem(item)) || [];
+        const compiledReqType = allocatedItemsList.map(item => item.productName).join(", ");
+        const compiledReqNotes = allocatedItemsList.map(item => {
+          const dept = allocationDialog.allocations[item.id] || "Production";
+          return `[${dept}] ${item.productName} (Qty: ${item.quantity})${item.specsSummary ? ` - Specs: ${item.specsSummary}` : ""}`;
+        }).join("\n");
+
+        await updateDeal(deal.id, {
+          requirementType: compiledReqType || "Allocation",
+          requirementNotes: compiledReqNotes || "No items allocated"
+        });
         await updateDealStatus(deal.id, targetStatus);
         setSuccessMessage(`Successfully allocated items and routed Deal to ${targetStatus}!`);
         // Refresh quotation list to update UI state
@@ -1167,35 +1179,35 @@ ${rowsHtml}
                                   </div>
                                 )}
                                 {status === QUOTATION_STATUS_ACCEPTED &&
-                                  quotation.leadStatus !== "Converted to Customer" &&
-                                  ["EMPLOYEE", "TEAM_LEAD", "ADMIN", "SUPER_ADMIN"].includes(userRole) && (
-                                    <div className="mt-2">
-                                      <button
-                                        type="button"
-                                        className="btn btn-success btn-sm w-100"
-                                        onClick={() => handleConvertToCustomer(quotation)}
-                                      >
-                                        <i className="ti ti-user-check me-1"></i>
-                                        Convert to Customer
-                                      </button>
-                                    </div>
-                                  )}
-                                 {status === QUOTATION_STATUS_ACCEPTED &&
-                                  quotation.leadStatus === "payment" &&
-                                  quotation.salesOrderStatus &&
-                                  quotation.salesOrderStatus !== "AWAITING_ADVANCE" &&
-                                  ["EMPLOYEE", "TEAM_LEAD", "ADMIN", "SUPER_ADMIN"].includes(userRole) && (
-                                    <div className="mt-2">
-                                      <button
-                                        type="button"
-                                        className="btn btn-primary btn-sm w-100"
-                                        onClick={() => openAllocationDialog(quotation)}
-                                      >
-                                        <i className="ti ti-arrows-split me-1"></i>
-                                        Allocate Items
-                                      </button>
-                                    </div>
-                                  )}
+                                   !["converted to customer", "deal", "allocate", "design", "production", "design + production"].includes(String(quotation.leadStatus || "").trim().toLowerCase()) &&
+                                   ["EMPLOYEE", "TEAM_LEAD", "MANAGER", "ADMIN", "SUPER_ADMIN"].includes(userRole) && (
+                                     <div className="mt-2">
+                                       <button
+                                         type="button"
+                                         className="btn btn-success btn-sm w-100"
+                                         onClick={() => handleConvertToCustomer(quotation)}
+                                       >
+                                         <i className="ti ti-user-check me-1"></i>
+                                         Convert to Customer
+                                       </button>
+                                     </div>
+                                   )}
+                                 {[QUOTATION_STATUS_ACCEPTED, QUOTATION_STATUS_APPROVED].includes(status) &&
+                                   ["payment", "allocate", "converted to customer"].includes(String(quotation.leadStatus || "").trim().toLowerCase()) &&
+                                   quotation.salesOrderStatus &&
+                                   quotation.salesOrderStatus !== "AWAITING_ADVANCE" &&
+                                   ["EMPLOYEE", "TEAM_LEAD", "MANAGER", "ADMIN", "SUPER_ADMIN"].includes(userRole) && (
+                                     <div className="mt-2">
+                                       <button
+                                         type="button"
+                                         className="btn btn-primary btn-sm w-100"
+                                         onClick={() => openAllocationDialog(quotation)}
+                                       >
+                                         <i className="ti ti-arrows-split me-1"></i>
+                                         Allocate Items
+                                       </button>
+                                     </div>
+                                    )}
                               </td>
                             )}
                             {isQtVis("total") && (

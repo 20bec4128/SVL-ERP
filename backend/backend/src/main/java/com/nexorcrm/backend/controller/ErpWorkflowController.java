@@ -8,6 +8,9 @@ import com.nexorcrm.backend.service.LeadPaymentEntryService;
 import com.nexorcrm.backend.service.JobTaskService;
 import com.nexorcrm.backend.repo.SalesOrderRepository;
 import com.nexorcrm.backend.repo.JobRepository;
+import com.nexorcrm.backend.repo.UserRepository;
+import com.nexorcrm.backend.repo.CustomerRepository;
+import org.springframework.security.core.Authentication;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,21 +24,39 @@ public class ErpWorkflowController {
     private final LeadPaymentEntryService paymentEntryService;
     private final JobRepository jobRepository;
     private final JobTaskService jobTaskService;
+    private final UserRepository userRepository;
+    private final CustomerRepository customerRepository;
 
     public ErpWorkflowController(
             SalesOrderRepository salesOrderRepository,
             LeadPaymentEntryService paymentEntryService,
             JobRepository jobRepository,
-            JobTaskService jobTaskService) {
+            JobTaskService jobTaskService,
+            UserRepository userRepository,
+            CustomerRepository customerRepository) {
         this.salesOrderRepository = salesOrderRepository;
         this.paymentEntryService = paymentEntryService;
         this.jobRepository = jobRepository;
         this.jobTaskService = jobTaskService;
+        this.userRepository = userRepository;
+        this.customerRepository = customerRepository;
     }
 
     // --- SALES ORDERS ---
     @GetMapping("/sales-orders")
-    public List<SalesOrder> getSalesOrders() {
+    public List<SalesOrder> getSalesOrders(Authentication authentication) {
+        if (authentication == null) {
+            return List.of();
+        }
+        String principal = authentication.getName();
+        com.nexorcrm.backend.entity.User user = userRepository.findByEmailIgnoreCaseAndIsDeletedFalse(principal)
+                .orElseGet(() -> userRepository.findByUsernameAndIsDeletedFalse(principal).orElse(null));
+
+        if (user != null && user.getRole() == com.nexorcrm.backend.entity.Role.CUSTOMER) {
+            return customerRepository.findByEmailAddress(user.getEmail())
+                    .map(cust -> salesOrderRepository.findByLeadId(cust.getSourceLeadId()))
+                    .orElse(List.of());
+        }
         return salesOrderRepository.findAll();
     }
 

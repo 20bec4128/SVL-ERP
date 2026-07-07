@@ -74,6 +74,16 @@ export async function updateProductionWorkStatus(dealId, workStatus) {
   return response?.data || null
 }
 
+export async function getDeliveryRequests() {
+  const response = await api.get('/api/v1/deals/delivery-requests')
+  return Array.isArray(response?.data) ? response.data : []
+}
+
+export async function markDelivered(dealId) {
+  const response = await api.patch(`/api/v1/deals/${dealId}/mark-delivered`)
+  return response?.data || null
+}
+
 export async function uploadDealPaymentProof(dealId, file) {
   const formData = new FormData()
   formData.append("file", file)
