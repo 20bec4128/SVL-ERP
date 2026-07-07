@@ -416,7 +416,13 @@ public class Lead {
     public Long getPreDealOwnerUserId() { return preDealOwnerUserId; }
     public void setPreDealOwnerUserId(Long preDealOwnerUserId) { this.preDealOwnerUserId = preDealOwnerUserId; }
     public String getRequirementType() { return requirementType; }
-    public void setRequirementType(String requirementType) { this.requirementType = requirementType; }
+    public void setRequirementType(String requirementType) {
+        if (requirementType != null && requirementType.length() > 100) {
+            this.requirementType = requirementType.substring(0, 97) + "...";
+        } else {
+            this.requirementType = requirementType;
+        }
+    }
     public String getRequirementFileName() { return requirementFileName; }
     public void setRequirementFileName(String requirementFileName) { this.requirementFileName = requirementFileName; }
     public String getRequirementFilePath() { return requirementFilePath; }

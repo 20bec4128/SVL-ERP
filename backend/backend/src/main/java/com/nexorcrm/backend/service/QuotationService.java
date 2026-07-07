@@ -22,6 +22,7 @@ import com.nexorcrm.backend.repo.UserRepository;
 import com.nexorcrm.backend.repo.EmployeeRepository;
 import com.nexorcrm.backend.repo.EmailTemplateRepository;
 import com.nexorcrm.backend.repo.SalesOrderRepository;
+import com.nexorcrm.backend.repo.CustomerRepository;
 import com.nexorcrm.backend.entity.EmailTemplate;
 import com.nexorcrm.backend.entity.ActivationStatus;
 import org.springframework.beans.factory.annotation.Value;
@@ -59,6 +60,7 @@ public class QuotationService {
 
     private final SalesOrderRepository salesOrderRepository;
     private final PasswordEncoder passwordEncoder;
+    private final CustomerRepository customerRepository;
 
     @Value("${app.frontend.url:http://localhost:5173}")
     private String frontendUrl;
@@ -73,7 +75,8 @@ public class QuotationService {
             EmployeeRepository employeeRepository,
             EmailTemplateRepository emailTemplateRepository,
             SalesOrderRepository salesOrderRepository,
-            PasswordEncoder passwordEncoder) {
+            PasswordEncoder passwordEncoder,
+            CustomerRepository customerRepository) {
         this.quotationRepository = quotationRepository;
         this.leadRepository = leadRepository;
         this.userRepository = userRepository;
@@ -84,6 +87,7 @@ public class QuotationService {
         this.emailTemplateRepository = emailTemplateRepository;
         this.salesOrderRepository = salesOrderRepository;
         this.passwordEncoder = passwordEncoder;
+        this.customerRepository = customerRepository;
     }
 
     public QuotationResponse createQuotation(QuotationRequest request) {
@@ -200,6 +204,7 @@ public class QuotationService {
             r.setLeadStatus(leadSnapshot.getStatus());
         }
         if (q.getLeadId() != null) {
+            r.setCustomerExists(customerRepository.findBySourceLeadId(q.getLeadId()).isPresent());
             List<com.nexorcrm.backend.entity.SalesOrder> orders = salesOrderRepository.findByLeadId(q.getLeadId());
             if (orders != null && !orders.isEmpty()) {
                 r.setSalesOrderStatus(orders.get(orders.size() - 1).getStatus());

@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/webhook/meta")
 public class MetaWebhookController {
 
     private static final Logger logger = LoggerFactory.getLogger(MetaWebhookController.class);
@@ -22,7 +21,7 @@ public class MetaWebhookController {
     private final MetaLeadRetrievalService metaLeadRetrievalService;
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    @Value("${meta.verify-token:svl_crm_secret}")
+    @Value("${meta.verify.token:${meta.verify-token:svl_crm_secret}}")
     private String verifyToken;
 
     public MetaWebhookController(CampaignLeadService campaignLeadService,
@@ -34,7 +33,7 @@ public class MetaWebhookController {
     /**
      * Webhook verification endpoint (GET request called by Meta during configuration).
      */
-    @GetMapping
+    @GetMapping({"/meta/webhook", "/api/v1/webhook/meta"})
     public ResponseEntity<String> verifyWebhook(
             @RequestParam(value = "hub.mode", required = false) String mode,
             @RequestParam(value = "hub.verify_token", required = false) String token,
@@ -54,7 +53,7 @@ public class MetaWebhookController {
     /**
      * Webhook event receiver (POST request called by Meta when a lead is created).
      */
-    @PostMapping
+    @PostMapping({"/meta/webhook", "/api/v1/webhook/meta"})
     public ResponseEntity<String> receiveWebhookEvent(@RequestBody String requestBody) {
         logger.info("Meta Webhook Event Received: {}", requestBody);
 

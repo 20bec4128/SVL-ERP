@@ -1091,30 +1091,21 @@ public class DealService {
         }
 
         // Auto-transition logic after final upload
-        String requirementTypeToCheck = deal.getRequirementType();
-        if (requirementTypeToCheck == null && deal.getSourceLeadId() != null) {
-            Lead sourceLead = leadRepository.findByIdAndDeletedFalse(deal.getSourceLeadId()).orElse(null);
-            if (sourceLead != null) {
-                requirementTypeToCheck = sourceLead.getRequirementType();
-                deal.setRequirementType(requirementTypeToCheck);
-            }
-        }
-
-        if ("Design + Production".equalsIgnoreCase(requirementTypeToCheck)
-                && ("design".equalsIgnoreCase(deal.getStatus()) || "design + production".equalsIgnoreCase(deal.getStatus()))) {
+        String currentStatus = deal.getStatus();
+        if ("Design + Production".equalsIgnoreCase(currentStatus)) {
             // Design+Production: move to Production stage for the production team
             deal.setStatus("Production");
             dealRepository.save(deal);
             if (deal.getSourceLeadId() != null) {
                 assignProductionRequest(deal.getSourceLeadId());
             }
-            logger.info("Auto-transitioned deal {} from Design to Production (Design + Production requirement)", id);
-        } else if ("design".equalsIgnoreCase(deal.getStatus()) || "Design + Production".equalsIgnoreCase(requirementTypeToCheck) == false) {
+            logger.info("Auto-transitioned deal {} from Design+Production to Production", id);
+        } else {
             // Design-only: move straight to Delivery and email customer
             deal.setStatus("Delivery");
             dealRepository.save(deal);
             sendDeliveryEmailToCustomer(deal);
-            logger.info("Auto-transitioned deal {} from Design to Delivery", id);
+            logger.info("Auto-transitioned deal {} to Delivery", id);
         }
 
         return toResponse(deal);
@@ -1222,6 +1213,36 @@ public class DealService {
         return false;
     }
 
+    private boolean isUserInFlowGroupForStatus(User user, String statusName) {
+        if (user == null || user.getId() == null) {
+            return false;
+        }
+        try {
+            var flowResponse = dealFlowService.getFlow();
+            List<Map<String, Object>> rules = flowResponse.getRules();
+            if (rules == null || rules.isEmpty()) {
+                return false;
+            }
+            for (Map<String, Object> rule : rules) {
+                if (rule == null) continue;
+                Object statusVal = rule.get("status");
+                if (statusVal != null && statusVal.toString().trim().equalsIgnoreCase(statusName)) {
+                    Object groupIdVal = rule.get("handledByGroupId");
+                    if (groupIdVal != null) {
+                        Long groupId = Long.parseLong(groupIdVal.toString());
+                        return userGroupMemberRepository.existsByGroupAndUserId(
+                            userGroupRepository.findById(groupId).orElse(null),
+                            user.getId()
+                        );
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.warn("Failed to check if user is in flow group for status " + statusName + ": " + e.getMessage());
+        }
+        return false;
+    }
+
     private boolean canViewDesignRequest(User actor, Deal deal, Set<Long> visibleGroupIds) {
         if (actor.getRole() == Role.SUPER_ADMIN || actor.getRole() == Role.ADMIN) {
             return true;
@@ -1233,6 +1254,11 @@ public class DealService {
                 .anyMatch(group -> parseCsv(group.getPageKeysCsv()).stream()
                         .anyMatch(key -> "design".equalsIgnoreCase(key)));
         if (hasDesignAccess) {
+            return true;
+        }
+
+        // Check if user is in the Design flow group
+        if (isUserInFlowGroupForStatus(actor, "Design") || isUserInFlowGroupForStatus(actor, "Design + Production")) {
             return true;
         }
 
@@ -1255,6 +1281,11 @@ public class DealService {
                 .anyMatch(group -> parseCsv(group.getPageKeysCsv()).stream()
                         .anyMatch(key -> "production".equalsIgnoreCase(key)));
         if (hasProductionAccess) {
+            return true;
+        }
+
+        // Check if user is in the Production flow group
+        if (isUserInFlowGroupForStatus(actor, "Production") || isUserInFlowGroupForStatus(actor, "Design + Production")) {
             return true;
         }
 

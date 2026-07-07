@@ -41,6 +41,11 @@ public class LeadPaymentEntryService {
     }
 
     public LeadPaymentEntry recordPayment(LeadPaymentEntry entry) {
+        if (entry.getLeadId() == null && entry.getSalesOrderId() != null) {
+            salesOrderRepository.findById(entry.getSalesOrderId()).ifPresent(so -> {
+                entry.setLeadId(so.getLeadId());
+            });
+        }
         entry.setStatus("PENDING");
         LeadPaymentEntry saved = paymentEntryRepository.save(entry);
 

@@ -37,6 +37,23 @@ public final class StatusRequirementTypeFilter {
             return statuses == null ? List.of() : statuses;
         }
         String rt = requirementType.trim();
+        
+        // Only apply filtering if requirementType matches one of our standard mapped types
+        boolean isStandardType = false;
+        for (Set<String> allowedSet : MAPPING.values()) {
+            for (String allowedVal : allowedSet) {
+                if (allowedVal.equalsIgnoreCase(rt)) {
+                    isStandardType = true;
+                    break;
+                }
+            }
+            if (isStandardType) break;
+        }
+        
+        if (!isStandardType) {
+            return statuses;
+        }
+
         return statuses.stream().filter(status -> {
             Set<String> allowed = MAPPING.get(status.trim().toLowerCase());
             // No mapping → visible for every requirement type

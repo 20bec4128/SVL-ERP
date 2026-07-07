@@ -194,7 +194,11 @@ public class DesignRequirement {
     }
 
     public void setRequirementType(String requirementType) {
-        this.requirementType = requirementType;
+        if (requirementType != null && requirementType.length() > 100) {
+            this.requirementType = requirementType.substring(0, 97) + "...";
+        } else {
+            this.requirementType = requirementType;
+        }
     }
 
     public String getRequirementNotes() {

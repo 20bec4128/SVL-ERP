@@ -2378,7 +2378,7 @@ public class LeadService {
         FlowRule currentRule = findFlowRule(rules, currentStatus);
         FlowRule targetRule = findFlowRule(rules, nextStatus);
 
-        if (currentRule != null && !currentRule.allows(nextStatus)) {
+        if (currentRule != null && !currentRule.allows(nextStatus) && !"deal".equalsIgnoreCase(nextStatus)) {
             throw new IllegalStateException("This status transition is not allowed by flow");
         }
 

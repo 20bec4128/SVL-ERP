@@ -1179,6 +1179,7 @@ ${rowsHtml}
                                   </div>
                                 )}
                                 {status === QUOTATION_STATUS_ACCEPTED &&
+                                   !quotation.customerExists &&
                                    !["converted to customer", "deal", "allocate", "design", "production", "design + production"].includes(String(quotation.leadStatus || "").trim().toLowerCase()) &&
                                    ["EMPLOYEE", "TEAM_LEAD", "MANAGER", "ADMIN", "SUPER_ADMIN"].includes(userRole) && (
                                      <div className="mt-2">

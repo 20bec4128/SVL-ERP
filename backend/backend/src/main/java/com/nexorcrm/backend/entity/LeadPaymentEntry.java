@@ -68,8 +68,10 @@ public class LeadPaymentEntry {
     public void setReferenceNo(String referenceNo) { this.referenceNo = referenceNo; }
     public String getProofFileName() { return proofFileName; }
     public void setProofFileName(String proofFileName) { this.proofFileName = proofFileName; }
+    public void setAttachmentName(String attachmentName) { this.proofFileName = attachmentName; }
     public String getProofFilePath() { return proofFilePath; }
     public void setProofFilePath(String proofFilePath) { this.proofFilePath = proofFilePath; }
+    public void setAttachmentPath(String attachmentPath) { this.proofFilePath = attachmentPath; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
     public Long getRecordedByUserId() { return recordedByUserId; }

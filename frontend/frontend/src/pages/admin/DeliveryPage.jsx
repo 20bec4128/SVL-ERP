@@ -3,6 +3,7 @@ import { useAuth } from "../../context/AuthContext";
 import { getDeliveryRequests, markDelivered } from "../../api/dealsApi";
 import { extractApiErrorMessage } from "../../utils/errorMessage";
 import { useToast } from "../../components/system/ToastProvider";
+import useConfirmDialog from "../../components/system/useConfirmDialog";
 
 function formatDate(value) {
   if (!value) return "-";
@@ -12,6 +13,7 @@ function formatDate(value) {
 export default function DeliveryPage() {
   const { user } = useAuth();
   const { showSuccess, showError } = useToast();
+  const { showConfirm, confirmDialog } = useConfirmDialog();
   const role = String(user?.role || "").toUpperCase();
 
   const [deals, setDeals] = useState([]);
@@ -45,6 +47,21 @@ export default function DeliveryPage() {
       showError(extractApiErrorMessage(e, "Failed to mark as delivered"));
     } finally {
       setMarkingId(null);
+    }
+  };
+
+  const onClickMarkDelivered = (deal) => {
+    const remaining = parseFloat(deal.remainingAmount || 0);
+    if (remaining > 0) {
+      showConfirm({
+        title: "Pending Amount Warning",
+        message: `There is a pending amount of ${remaining}. Are you sure you want to deliver this item?`,
+        confirmLabel: "Deliver anyway",
+        cancelLabel: "Cancel",
+        onConfirm: () => handleMarkDelivered(deal.id),
+      });
+    } else {
+      handleMarkDelivered(deal.id);
     }
   };
 
@@ -162,7 +179,7 @@ export default function DeliveryPage() {
                               <button
                                 className="btn btn-sm btn-success"
                                 style={{ borderRadius: 8, fontWeight: "600" }}
-                                onClick={() => handleMarkDelivered(deal.id)}
+                                onClick={() => onClickMarkDelivered(deal)}
                                 disabled={markingId === deal.id}
                               >
                                 {markingId === deal.id
@@ -186,6 +203,7 @@ export default function DeliveryPage() {
           )}
         </div>
       </div>
+      {confirmDialog}
     </div>
   );
 }

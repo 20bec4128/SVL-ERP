@@ -48,6 +48,7 @@ public class QuotationResponse {
     private String status;
     private String leadStatus;
     private String salesOrderStatus;
+    private Boolean customerExists;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private List<QuotationItemResponse> items;
@@ -167,4 +168,6 @@ public class QuotationResponse {
     public void setLeadStatus(String leadStatus) { this.leadStatus = leadStatus; }
     public String getSalesOrderStatus() { return salesOrderStatus; }
     public void setSalesOrderStatus(String salesOrderStatus) { this.salesOrderStatus = salesOrderStatus; }
+    public Boolean getCustomerExists() { return customerExists; }
+    public void setCustomerExists(Boolean customerExists) { this.customerExists = customerExists; }
 }
